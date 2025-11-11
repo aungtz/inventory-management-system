@@ -92,9 +92,21 @@
                     <span>Products</span>
                 </a>
 
-                <a href="#" class="flex items-center space-x-3 p-3 rounded-lg hover:bg-slate-700/50 transition-colors">
+                <a href="/category" class="flex items-center space-x-3 p-3 rounded-lg hover:bg-slate-700/50 transition-colors">
                     <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
+                    </svg>
+                    <span>Category</span>
+                </a>
+                <a href="/stock" class="flex items-center space-x-3 p-3 rounded-lg hover:bg-slate-700/50 transition-colors">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4" />
+                    </svg>
+                    <span>Stock Control</span>
+                </a>
+                <a href="/sales" class="flex items-center space-x-3 p-3 rounded-lg hover:bg-slate-700/50 transition-colors">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4" />
                     </svg>
                     <span>Sales</span>
                 </a>
@@ -175,7 +187,7 @@
                         <div class="flex items-center justify-between">
                             <div>
                                 <p class="text-blue-100 text-sm">Total Users</p>
-                                <h3 class="text-3xl font-bold mt-2">1,248</h3>
+                                <h3 class="text-3xl font-bold mt-2">{{ $totalUsers }}</h3>
                                 <p class="text-blue-100 text-sm mt-2">↑ 12% from last month</p>
                             </div>
                             <div class="w-12 h-12 bg-white/20 rounded-xl flex items-center justify-center">
@@ -207,8 +219,7 @@
                         <div class="flex items-center justify-between">
                             <div>
                                 <p class="text-purple-100 text-sm">Inventory Status</p>
-                                <h3 class="text-3xl font-bold mt-2">78%</h3>
-                                <p class="text-purple-100 text-sm mt-2">↓ 5% from last month</p>
+                                <h3 class="text-3xl font-bold mt-2">{{ $inventoryPercent }}%</h3>
                             </div>
                             <div class="w-12 h-12 bg-white/20 rounded-xl flex items-center justify-center">
                                 <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">

@@ -10,7 +10,7 @@ class ProductManagementController extends Controller
     public function index()
     {
         $products = Product::latest()->get();
-        return view('views.productManagement', compact('products'));
+        return view('inventory.productManagement', compact('products'));
     }
 
 

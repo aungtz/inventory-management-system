@@ -80,23 +80,30 @@ public function exportAll()
     ]);
 
     // CREATE SKUs FROM JSON
-    if ($request->has('skus_json') && !empty($request->skus_json)) {
+    if ($request->has('skus_json') && !empty($request->skus_json)) {    
         $skusData = json_decode($request->skus_json, true);
         
-        if (is_array($skusData)) {
-            foreach ($skusData as $skuData) {
-                $item->skus()->create([
-                    'Size_Name'   => $skuData['SizeName'] ?? null,
-                    'Color_Name'  => $skuData['ColorName'] ?? null,
-                    'Size_Code'   => $skuData['SizeCode'] ?? null,
-                    'Color_Code'  => $skuData['ColorCode'] ?? null,
-                    'JanCode'     => $skuData['JanCode'] ?? null,
-                    'Quantity'    => $skuData['StockQty'] ?? 0,
-                    'CreatedBy'   => auth()->user()->name ?? 'system',
-                    'UpdatedBy'   => auth()->user()->name ?? 'system',
-                ]);
-            }
+        // CREATE SKUs FROM JSON
+if ($request->filled('skus_json')) {
+
+    $skusData = json_decode($request->skus_json, true);
+
+    if (is_array($skusData)) {
+        foreach ($skusData as $skuData) {
+            $item->skus()->create([
+                'Size_Name'   => $skuData['sizeName'] ?? null,
+                'Color_Name'  => $skuData['colorName'] ?? null,
+                'Size_Code'   => $skuData['sizeCode'] ?? null,
+                'Color_Code'  => $skuData['colorCode'] ?? null,
+                'JanCode'     => $skuData['janCode'] ?? null,
+                'Quantity'    => $skuData['stockQuantity'] ?? 0,
+                'CreatedBy'   => auth()->user()->name ?? 'system',
+                'UpdatedBy'   => auth()->user()->name ?? 'system',
+            ]);
         }
+    }
+}
+
     }
 
     // CREATE IMAGES - Only process valid files

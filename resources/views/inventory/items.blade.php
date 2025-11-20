@@ -373,7 +373,7 @@
         </div>
 
         <!-- Hidden SKU Data -->
-        <input type="hidden" name="skus_json" id="skus_json" value="">
+        <input type="hidden" name="skus_json" id="skus_json" >
 
         <!-- Submit Buttons -->
         <div class="flex justify-end mt-8 space-x-4 pt-6 border-t border-gray-200 slide-in-up">
@@ -601,6 +601,8 @@
 
   // Save cleaned SKUs to state
   state.skus = newSkus.map(({ _key, ...sku }) => sku);
+  document.getElementById('skus_json').value = JSON.stringify(state.skus);
+
   renderSkuTable();
   skuModal.classList.remove('active');
 });
@@ -618,6 +620,11 @@
       addSkuRow();
     }
   }
+
+  document.getElementById('itemForm').addEventListener('submit', function() {
+    document.getElementById('skus_json').value = JSON.stringify(state.skus);
+});
+
 
   function addSkuRow(skuData = {}) {
     const skuModalBody = document.getElementById('skuModalBody');

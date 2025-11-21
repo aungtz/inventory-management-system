@@ -48,6 +48,7 @@
 
     </style>
 </head>
+
 <body class="bg-gradient-to-br from-blue-50 to-indigo-100 min-h-screen font-sans">
     <div class="container mx-auto px-4 py-8">
         <!-- Header Section -->
@@ -265,40 +266,117 @@
                   <!-- 3. Pricing & SKU Stock -->
                             <div class="lg:px-6 lg:py-4 lg:border-r border-gray-100 pt-4 lg:pt-0">
                                 <div class="space-y-4">
-                                    {{-- Total Stock Card & Toggle Button --}}
-                                    <div class="p-4 rounded-xl bg-indigo-50 border border-indigo-200 shadow-lg">
-                                        <div class="flex justify-between items-center mb-1">
-                                            <span class="text-sm font-medium text-indigo-600 uppercase tracking-wider">
-                                                Total Stock ({{ $skuCount }} SKUs)
-                                            </span>
-                                            @if($skuCount > 0)
-                                             <button onclick="openSkuModal({{ $item->id }})"
-                    class="text-indigo-500 hover:text-indigo-700 transition-colors p-1 rounded-full hover:bg-indigo-100 text-sm">
-                <i class="fas fa-eye"></i> View SKUs
-            </button>
+                                   {{-- ========================================================= --}}
+{{-- 1. JavaScript Functions (Define before usage) --}}
+{{-- ========================================================= --}}
 
-                                            @endif
-                                        </div>
-                                        
-                                        <p class="font-extrabold text-4xl mt-1 {{ $totalStock > 0 ? 'text-indigo-800' : 'text-red-600' }}">
-                                            {{ $totalStock }}
-                                        </p>
-                                    </div>
-                                    
-                                    {{-- Collapsible SKU List --}}
-               <div id="skuModal" class="modal-overlay fixed inset-0 z-50 items-center justify-center bg-black/40 backdrop-blur hidden">
-    <div class="modal-content bg-white rounded-3xl shadow-2xl p-6 max-w-lg w-full">
-        <div class="flex justify-between items-center mb-4">
-            <h2 class="text-xl font-bold text-indigo-700">SKU Details</h2>
-            <button onclick="closeSkuModal()" class="text-gray-500 hover:text-gray-700">
-                <i class="fas fa-times text-2xl"></i>
-            </button>
+<script>
+     window.showSkuTable = function(button, itemCode) {
+        // သက်ဆိုင်ရာ item အတွက် container ကို ရယူပါ
+        const containerId = `skuTableContainer-${itemCode}`;
+        const contentId = `skuTableContent-${itemCode}`;
+        
+        const container = document.getElementById(containerId);
+        const content = document.getElementById(contentId);
+
+        // အကယ်၍ container က ပွင့်နေပြီးသားဆိုရင် ပြန်ပိတ်ရန်
+        if (!container.classList.contains('hidden')) {
+            container.classList.add('hidden');
+            return;
+        }
+
+        // URL encoded data ကို decode လုပ်ပြီး JSON အဖြစ် ပြောင်းပါ
+        const pivotData = JSON.parse(decodeURIComponent(button.dataset.pivotSkus));
+
+        if (!pivotData || pivotData.length === 0) {
+            content.innerHTML = '<p class="text-gray-500 text-center">No SKUs available.</p>';
+            container.classList.remove('hidden');
+            return;
+        }
+
+        // Pivot table ကို စတင်တည်ဆောက်ခြင်း
+        let tableHTML = `
+            <table class="w-full text-sm text-left border border-gray-200">
+                <thead class="bg-gray-100 font-semibold text-gray-700">
+                    <tr>
+                        <th class="p-2 border-b">Color</th>
+                        <th class="p-2 border-b">S</th>
+                        <th class="p-2 border-b">M</th>
+                        <th class="p-2 border-b">L</th>
+                        <th class="p-2 border-b">XL</th>
+                    </tr>
+                </thead>
+                <tbody>
+        `;
+
+        pivotData.forEach(row => {
+            tableHTML += `
+                <tr class="border-b">
+                    <td class="p-2">${row.Color_Name}</td>
+                    <td class="p-2">${row.S}</td>
+                    <td class="p-2">${row.M}</td>
+                    <td class="p-2">${row.L}</td>
+                    <td class="p-2">${row.XL}</td>
+                </tr>
+            `;
+        });
+
+        tableHTML += `</tbody></table>`;
+
+        // Content ကို ထည့်သွင်းပြီး Container ကို ပြသပါ
+        content.innerHTML = tableHTML;
+        container.classList.remove('hidden');
+    };
+</script>
+
+
+
+<div class="lg:px-6 lg:py-4 lg:border-r border-gray-100 pt-4 lg:pt-0">
+    <div class="space-y-4">
+        {{-- Total Stock Card & Toggle Button --}}
+        <div class="p-4 rounded-xl bg-indigo-50 border border-indigo-200 shadow-lg">
+            <div class="flex justify-between items-center mb-1">
+                {{-- ... Stock Title ... --}}
+                
+                @if($skuCount > 0)
+                    {{-- item ၏ သက်ဆိုင်ရာ Pivot Data ကို ဤနေရာတွင် စစ်ထုတ်သည် --}}
+                    @php
+                        // $pivotSkus ကို controller မှ ပို့ထားပြီး၊ $item သည် loop အတွင်းမှဖြစ်မည်။
+                        $itemPivotSkus = collect($pivotSkus)->where('Item_Code', $item->Item_Code)->values();
+                    @endphp
+
+                 <button
+                        onclick="showSkuTable(this, '{{ $item->Item_Code }}')" {{-- function အသစ်ကို ခေါ်ပြီး Item Code ကို ထည့်ပေးသည် --}}
+                        data-pivot-skus="{{ urlencode(json_encode($itemPivotSkus)) }}"
+                        class="text-indigo-500 hover:text-indigo-700 p-1 rounded hover:bg-indigo-100"
+                    >
+                        <i class="fas fa-eye"></i> View SKUs
+                    </button>
+                @endif
+            </div>
+            
+            <p class="font-extrabold text-4xl mt-1 {{ $totalStock > 0 ? 'text-indigo-800' : 'text-red-600' }}">
+                {{ $totalStock }}
+            </p>
         </div>
-        <div id="skuModalContent" class="space-y-2 max-h-96 overflow-y-auto">
-            <!-- SKUs will be injected here by JS -->
+        
+        {{-- Modal Structure --}}
+        <div 
+            id="skuTableContainer-{{ $item->Item_Code }}" {{-- Item Code ဖြင့် ID ပေးသည် --}}
+            class="p-4 rounded-xl border border-gray-200 shadow-sm hidden" {{-- စစချင်းမှာ ဝှက်ထားသည် --}}
+        >
+            <h3 class="text-lg font-semibold text-gray-700 mb-3">SKU Details (Pivot)</h3>
+            
+            {{-- Table ကို ထည့်သွင်းရန် နေရာ --}}
+            <div id="skuTableContent-{{ $item->Item_Code }}" 
+                 class="space-y-2 max-h-96 overflow-y-auto" {{-- Scrollbar ပါရှိသည် --}}
+            >
+                </div>
         </div>
     </div>
 </div>
+                                    
+                               
 
 
 
@@ -434,6 +512,57 @@
     </div>
     
     <script>
+
+        window.openSkuModal = function(button) {
+    const modal = document.getElementById('skuModal');
+    const content = document.getElementById('skuModalContent');
+
+    // Decode the JSON safely
+    const pivotData = JSON.parse(decodeURIComponent(button.dataset.pivotSkus));
+
+    if (!pivotData || pivotData.length === 0) {
+        content.innerHTML = '<p class="text-gray-500 text-center">No SKUs available.</p>';
+        modal.classList.remove('hidden');
+        return;
+    }
+
+    // Build pivot table
+    let tableHTML = `
+        <table class="w-full text-sm text-left border border-gray-200">
+            <thead class="bg-gray-100 font-semibold text-gray-700">
+                <tr>
+                    <th class="p-2 border-b">Color</th>
+                    <th class="p-2 border-b">S</th>
+                    <th class="p-2 border-b">M</th>
+                    <th class="p-2 border-b">L</th>
+                    <th class="p-2 border-b">XL</th>
+                </tr>
+            </thead>
+            <tbody>
+    `;
+
+    pivotData.forEach(row => {
+        tableHTML += `
+            <tr class="border-b">
+                <td class="p-2">${row.Color_Name}</td>
+                <td class="p-2">${row.S}</td>
+                <td class="p-2">${row.M}</td>
+                <td class="p-2">${row.L}</td>
+                <td class="p-2">${row.XL}</td>
+            </tr>
+        `;
+    });
+
+    tableHTML += `</tbody></table>`;
+
+    content.innerHTML = tableHTML;
+    modal.classList.remove('hidden');
+};
+
+window.closeSkuModal = function() {
+    document.getElementById('skuModal').classList.add('hidden');
+};
+
 document.addEventListener('DOMContentLoaded', function () {
     const modal = document.getElementById('importItemsModal');
     const closeBtn = document.getElementById('closeItemsModal');
@@ -563,30 +692,12 @@ importForm.addEventListener('submit', (e) => {
     // e.g. FormData -> POST /import-items
 });
 
-function openSkuModal(itemId) {
-    const modal = document.getElementById('skuModal');
-    const content = document.getElementById('skuModalContent');
 
-    // Find the SKUs from the page
-    const skuRows = document.querySelectorAll(`#sku-details-${itemId} .flex.justify-between`);
-    content.innerHTML = '';
 
-    if (skuRows.length === 0) {
-        content.innerHTML = '<p class="text-gray-500 text-center">No SKUs available.</p>';
-    } else {
-        skuRows.forEach(row => {
-            const clone = row.cloneNode(true);
-            clone.classList.remove('border-b', 'last:border-b-0'); // optional styling cleanup
-            content.appendChild(clone);
-        });
-    }
-
-    modal.classList.remove('hidden');
-}
-
-function closeSkuModal() {
+window.closeSkuModal = function() {
     document.getElementById('skuModal').classList.add('hidden');
-}
+};
+
 
 // Optional: close modal when clicking outside
 document.getElementById('skuModal').addEventListener('click', (e) => {
@@ -707,4 +818,5 @@ function openImageGalleryFromElement(el) {
         });
     </script>
 </body>
+
 </html>

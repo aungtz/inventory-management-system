@@ -244,8 +244,8 @@
               <div class="transform transition-all duration-300 hover:scale-[1.02]">
                 <label class="block font-semibold mb-2 text-gray-700">Basic Price <span class="text-red-500">*</span></label>
                 <div class="flex items-center">
-                  <input type="number" name="BasicPrice" required placeholder="0" 
-                         class="input-focus flex-1 p-3 rounded-xl border border-gray-300 focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-all duration-300" />
+                  <input type="text" name="BasicPrice" required placeholder="0" 
+                         class="price-input input-focus flex-1 p-3 rounded-xl border border-gray-300 focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-all duration-300" />
                   <span class="ml-3 text-gray-600 font-medium">円</span>
                 </div>
               </div>
@@ -253,8 +253,8 @@
               <div class="transform transition-all duration-300 hover:scale-[1.02]">
                 <label class="block font-semibold mb-2 text-gray-700">List Price <span class="text-red-500">*</span></label>
                 <div class="flex items-center">
-                  <input type="number" name="ListPrice" required placeholder="0" 
-                         class="input-focus flex-1 p-3 rounded-xl border border-gray-300 focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-all duration-300" />
+                  <input type="text" name="ListPrice" required placeholder="0" 
+                         class="price-input input-focus flex-1 p-3 rounded-xl border border-gray-300 focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-all duration-300" />
                   <span class="ml-3 text-gray-600 font-medium">円</span>
                 </div>
               </div>
@@ -262,8 +262,8 @@
               <div class="transform transition-all duration-300 hover:scale-[1.02]">
                 <label class="block font-semibold mb-2 text-gray-700">Cost Price <span class="text-red-500">*</span></label>
                 <div class="flex items-center">
-                  <input type="number" name="CostPrice" required placeholder="0" 
-                         class="input-focus flex-1 p-3 rounded-xl border border-gray-300 focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-all duration-300" />
+                  <input type="text" name="CostPrice" required placeholder="0" 
+                         class="price-input input-focus flex-1 p-3 rounded-xl border border-gray-300 focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-all duration-300" />
                   <span class="ml-3 text-gray-600 font-medium">円</span>
                 </div>
               </div>
@@ -621,9 +621,40 @@
     }
   }
 
+function formatPriceInput(input) {
+    let value = input.value.replace(/,/g, '');        // remove commas
+    value = value.replace(/\D/g, '');                // remove non-digits
+
+    if (value === '') {
+        input.value = '';
+        return;
+    }
+
+    input.value = Number(value).toLocaleString('ja-JP'); // add commas
+}
+
+// --- Remove commas before submit ---
+function unformatPrice(value) {
+    return value.replace(/,/g, '');
+}
+
+// Apply to all 3 price fields
+document.querySelectorAll('.price-input').forEach(input => {
+    input.addEventListener('input', () => formatPriceInput(input));
+    input.addEventListener('blur', () => formatPriceInput(input));
+});
+
+
+
   document.getElementById('itemForm').addEventListener('submit', function() {
     document.getElementById('skus_json').value = JSON.stringify(state.skus);
+
+    const priceFields = document.querySelectorAll('.price-input');
+    priceFields.forEach(f => {
+        f.value = unformatPrice(f.value); 
+    });
 });
+
 
 
   function addSkuRow(skuData = {}) {
@@ -729,6 +760,8 @@
     });
   }
 }
+
 </script>
+<script src="{{ asset('js/validation/item-validation.js') }}"></script>
 </body>
 </html>

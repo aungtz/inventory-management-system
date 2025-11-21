@@ -20,7 +20,22 @@ public function index()
         // $items = \App\Models\Item::with(['images', 'skus'])->orderBy('CreatedDate', 'desc')->get();
          $items = Item::with(['images', 'skus'])->orderBy('CreatedDate', 'desc')->get();
 
-    return view('items.index', compact('items'));
+    $pivotSkus = DB::table('M_sku')
+        ->select('Item_Code', 'Color_Name',
+            DB::raw('SUM(CASE WHEN Size_Name = \'S\' THEN Quantity ELSE 0 END) AS S'),
+            DB::raw('SUM(CASE WHEN Size_Name = \'M\' THEN Quantity ELSE 0 END) AS M'),
+            DB::raw('SUM(CASE WHEN Size_Name = \'L\' THEN Quantity ELSE 0 END) AS L'),
+            DB::raw('SUM(CASE WHEN Size_Name = \'XL\' THEN Quantity ELSE 0 END) AS XL')
+        )
+        ->groupBy('Item_Code', 'Color_Name')
+        ->orderBy('Item_Code')
+        ->orderBy('Color_Name')
+        ->get();
+
+    // Convert to array for easier access in Blade
+    $pivotSkus = json_decode(json_encode($pivotSkus), true);
+
+    return view('items.index', compact('items', 'pivotSkus'));
 }
 
 public function exportItems()

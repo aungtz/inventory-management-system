@@ -204,7 +204,10 @@
                             <!-- 1. Image & Code -->
                             <div class="lg:px-6 lg:py-4 lg:border-r border-gray-100 flex items-center gap-4 lg:block">
                                 <div class="relative w-24 h-24 rounded-xl overflow-hidden border-2 border-gray-200 shadow-md group-hover:border-indigo-400 transition-colors cursor-pointer flex-shrink-0" 
-                                     onclick="openImageGallery('{{ $item->Item_Name }}', @json($item->images))">
+                                 data-images='@json($item->images->values())'
+     data-name="{{ $item->Item_Name }}"
+     onclick="openImageGalleryFromElement(this)"
+>
                                     @if($item->images && $item->images->count() > 0)
                                         <img src="{{ asset('storage/items/' . $item->images->first()->Image_Name) }}" alt="{{ $item->Item_Name }}">
 
@@ -269,10 +272,11 @@
                                                 Total Stock ({{ $skuCount }} SKUs)
                                             </span>
                                             @if($skuCount > 0)
-                                                <button onclick="toggleSkus({{ $item_id }})" 
-                                                        class="text-indigo-500 hover:text-indigo-700 transition-colors p-1 rounded-full hover:bg-indigo-100 text-sm">
-                                                    <i id="sku-toggle-icon-{{ $item_id }}" class="fas fa-chevron-down"></i>
-                                                </button>
+                                             <button onclick="openSkuModal({{ $item->id }})"
+                    class="text-indigo-500 hover:text-indigo-700 transition-colors p-1 rounded-full hover:bg-indigo-100 text-sm">
+                <i class="fas fa-eye"></i> View SKUs
+            </button>
+
                                             @endif
                                         </div>
                                         
@@ -282,27 +286,22 @@
                                     </div>
                                     
                                     {{-- Collapsible SKU List --}}
-                         <div id="sku-details-{{ $item_id }}" class="overflow-hidden transition-[max-height] duration-300" style="max-height:0;">
-
-    
-    <div class="bg-white border border-gray-200 rounded-lg p-3 shadow-sm block">
-
-                                            <p class="text-xs font-semibold text-gray-600 uppercase mb-2">SKU Breakdown</p>
-                                            @foreach($item->skus as $sku)
-                                               <div class="flex justify-between text-sm py-1 border-b border-gray-100 last:border-b-0">
-                                                    <span class="text-gray-700 font-medium">
-                                                        {{ $sku->Color_Name }} / {{ $sku->Size_Name }}
-                                                    </span>
-
-                                                    <span class="font-bold {{ $sku->Quantity > 0 ? 'text-green-600' : 'text-red-500' }}">
-                                                        {{ $sku->Quantity }} pcs
-                                                    </span>
-                                                </div>
+               <div id="skuModal" class="modal-overlay fixed inset-0 z-50 items-center justify-center bg-black/40 backdrop-blur hidden">
+    <div class="modal-content bg-white rounded-3xl shadow-2xl p-6 max-w-lg w-full">
+        <div class="flex justify-between items-center mb-4">
+            <h2 class="text-xl font-bold text-indigo-700">SKU Details</h2>
+            <button onclick="closeSkuModal()" class="text-gray-500 hover:text-gray-700">
+                <i class="fas fa-times text-2xl"></i>
+            </button>
+        </div>
+        <div id="skuModalContent" class="space-y-2 max-h-96 overflow-y-auto">
+            <!-- SKUs will be injected here by JS -->
+        </div>
+    </div>
+</div>
 
 
-                                            @endforeach
-                                        </div>
-                                    </div>
+
                                     
                                     {{-- Pricing Metrics --}}
                                     <div class="grid grid-cols-2 gap-3 text-sm">
@@ -564,6 +563,35 @@ importForm.addEventListener('submit', (e) => {
     // e.g. FormData -> POST /import-items
 });
 
+function openSkuModal(itemId) {
+    const modal = document.getElementById('skuModal');
+    const content = document.getElementById('skuModalContent');
+
+    // Find the SKUs from the page
+    const skuRows = document.querySelectorAll(`#sku-details-${itemId} .flex.justify-between`);
+    content.innerHTML = '';
+
+    if (skuRows.length === 0) {
+        content.innerHTML = '<p class="text-gray-500 text-center">No SKUs available.</p>';
+    } else {
+        skuRows.forEach(row => {
+            const clone = row.cloneNode(true);
+            clone.classList.remove('border-b', 'last:border-b-0'); // optional styling cleanup
+            content.appendChild(clone);
+        });
+    }
+
+    modal.classList.remove('hidden');
+}
+
+function closeSkuModal() {
+    document.getElementById('skuModal').classList.add('hidden');
+}
+
+// Optional: close modal when clicking outside
+document.getElementById('skuModal').addEventListener('click', (e) => {
+    if (e.target === document.getElementById('skuModal')) closeSkuModal();
+});
 
 
 
@@ -571,7 +599,7 @@ importForm.addEventListener('submit', (e) => {
          * Toggles the visibility of the SKU details section for a specific item.
          * @param {number} itemId - The ID of the item.
          */
-       function toggleSkus(itemId) {
+    function toggleSkus(itemId) {
     const details = document.getElementById(`sku-details-${itemId}`);
     const icon = document.getElementById(`sku-toggle-icon-${itemId}`);
 
@@ -581,7 +609,9 @@ importForm.addEventListener('submit', (e) => {
     }
 
     if (details.style.maxHeight === '0px' || details.style.maxHeight === '') {
-        details.style.maxHeight = details.scrollHeight + 'px';
+        requestAnimationFrame(() => {
+            details.style.maxHeight = details.scrollHeight + 'px';
+        });
         icon.classList.remove('fa-chevron-down');
         icon.classList.add('fa-chevron-up');
     } else {
@@ -591,17 +621,35 @@ importForm.addEventListener('submit', (e) => {
     }
 }
 
+function openImageGalleryFromElement(el) {
+    const itemName = el.getAttribute('data-name');
+    let images = el.getAttribute('data-images');
+
+    try {
+        images = JSON.parse(images);
+    } catch (e) {
+        console.error("JSON Error:", e, images);
+        images = [];
+    }
+
+    openImageGallery(itemName, images);
+}
+
         /**
          * Generic Function to open the Image Gallery Modal
          * @param {string} itemName - The name of the item to display in the modal title.
          * @param {Array<Object>} images - An array of image objects, each containing an Image_Name property.
          */
-       function openImageGallery(itemName, images) {
+      function openImageGallery(itemName, images) {
+    if (images && !Array.isArray(images)) {
+        images = Object.values(images);
+    }
+
     const modal = document.getElementById('imageGalleryModal');
     const content = document.getElementById('galleryContent');
     const title = document.getElementById('galleryTitle');
     const emptyMessage = document.getElementById('galleryEmptyMessage');
-    
+
     content.innerHTML = '';
     title.textContent = `Image Gallery: ${itemName}`;
 
@@ -611,23 +659,19 @@ importForm.addEventListener('submit', (e) => {
     } else {
         emptyMessage.style.display = 'none';
         content.style.display = 'grid';
-        
+
         images.forEach((image, index) => {
-            const imageUrl = `/storage/items/${image.Image_Name}`; // ✅ fixed path
-            const imageElement = document.createElement('div');
-            imageElement.className = 'w-full aspect-square rounded-lg overflow-hidden shadow-lg border border-gray-200 transition-all duration-300 hover:shadow-xl hover:border-indigo-400';
-            
-            imageElement.innerHTML = `
-                <img src="${imageUrl}" 
-                     alt="${itemName} Image ${index + 1}"
-                     class="w-full h-full object-cover">
-            `;
-            content.appendChild(imageElement);
+            const imageUrl = `/storage/items/${image.Image_Name}`;
+            const div = document.createElement('div');
+            div.className = "w-full aspect-square rounded-lg overflow-hidden shadow";
+            div.innerHTML = `<img src="${imageUrl}" class="w-full h-full object-cover">`;
+            content.appendChild(div);
         });
     }
 
     modal.style.display = 'flex';
 }
+
 
 
         function closeImageGallery() {

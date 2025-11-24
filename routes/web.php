@@ -75,6 +75,10 @@ Route::get('/test-upload', function () {
     return 'done';
 });
 
+Route::get('/check-item-code', function (Request $request) {
+    $exists = \App\Models\Item::where('Item_Code', $request->code)->exists();
+    return response()->json(['exists' => $exists]);
+});
 
 Route::get('/export-items', [ItemController::class, 'exportItems'])->name('export.items');
 Route::get('/export-skus', [ItemController::class, 'exportSkus'])->name('export.skus');

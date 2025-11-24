@@ -578,29 +578,31 @@ function setupImageSlot(i) {
     if (!sizeName && !colorName && !sizeCode && !colorCode && !janCode) return;
 
     // Build a unique key for validation
-    const key = `${sizeName}|${colorName}`;
+const keyName = `${sizeName}__${colorName}`;
+    const keyCode = `${sizeCode}__${colorCode}`;
 
     // Check for duplicates in current collection
-    if (newSkus.some(s => s._key === key)) {
-      duplicateFound = true;
+    if (newSkus.some(s => s.keyName === keyName || s.keyCode === keyCode)) {
+        duplicateFound = true;
     } else {
-      newSkus.push({
-        _key: key,
-        sizeName, 
-        colorName, 
-        sizeCode, 
-        colorCode, 
-        janCode, 
-        qtyFlag, 
-        stockQuantity: parseInt(stockQuantity) || 0
-      });
+        newSkus.push({
+            keyName,
+            keyCode,
+            sizeName,
+            colorName,
+            sizeCode,
+            colorCode,
+            janCode,
+            qtyFlag,
+            stockQuantity: parseInt(stockQuantity) || 0
+        });
     }
-  });
+});
 
-  if (duplicateFound) {
-    alert('Duplicate SKUs found! Each Color + Size combination must be unique.');
+if (duplicateFound) {
+    alert("Duplicate SKUs found! Size+Color or Code+Code must be unique.");
     return;
-  }
+}
 
   // Save cleaned SKUs to state
   state.skus = newSkus.map(({ _key, ...sku }) => sku);
@@ -766,6 +768,23 @@ document.querySelectorAll('.price-input').forEach(input => {
     });
   }
 }
+document.getElementById('itemForm').addEventListener('submit', async function(e) {
+    e.preventDefault(); // stop normal submit
+
+    const itemCode = document.querySelector('input[name="Item_Code"]').value.trim();
+
+    // Check duplicate item code first
+    const response = await fetch(`/check-item-code?code=${itemCode}`);
+    const data = await response.json();
+
+    if (data.exists) {
+        alert("❌ Item Code already exists. Please use another one.");
+        return;
+    }
+
+    // No duplicate → submit form normally
+    this.submit();
+});
 
 </script>
 <!-- <script src="{{ asset('js/validation/item-validation.js') }}"></script> -->

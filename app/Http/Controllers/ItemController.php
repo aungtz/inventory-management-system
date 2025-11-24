@@ -121,23 +121,45 @@ if ($request->filled('skus_json')) {
 
     }
 
-    // CREATE IMAGES - Only process valid files
-    if ($request->hasFile('images')) {
-        foreach ($request->file('images') as $index => $image) {
-            // Check if file is valid and not empty
-            if ($image && $image->isValid() && $image->getSize() > 0) {
-                $filename = time() . '_' . $image->getClientOriginalName();
-                $image->storeAs('items', $filename, 'public');
+  if ($request->hasFile('images')) {
+    foreach ($request->file('images') as $index => $image) {
+        if ($image && $image->isValid() && $image->getSize() > 0) {
 
-                ItemImage::create([
-                    'Item_Code'    => $item->Item_Code,
-                    'Image_Name'   => $filename,
-                    'CreatedDate'  => now(),
-                    'UpdatedDate'  => now(),
-                ]);
+            // 1. Get name input
+            $rawName = $request->input('image_names')[$index] ?? $image->getClientOriginalName();
+
+            // Trim whitespace
+            $rawName = trim($rawName);
+
+            // 2. Extract extension from uploaded file
+            $ext = strtolower($image->getClientOriginalExtension());
+
+            // 3. Check if the user already included an extension in name
+            if (preg_match('/\.(jpg|jpeg|png|gif|webp)$/i', $rawName)) {
+                // user already included extension → keep it
+                $baseName = pathinfo($rawName, PATHINFO_FILENAME);
+            } else {
+                // user did NOT include extension → append correct extension
+                $baseName = $rawName . '.' . $ext;
             }
+
+            // 4. Build final filename (unique)
+            $filename = time() . '_' . preg_replace('/\s+/', '_', $baseName);
+
+            // 5. Store file
+            $image->storeAs('items', $filename, 'public');
+
+            // 6. Save to DB
+            ItemImage::create([
+                'Item_Code'   => $item->Item_Code,
+                'Image_Name'  => $filename,
+                'CreatedDate' => now(),
+                'UpdatedDate' => now(),
+            ]);
         }
     }
+}
+
 
     return redirect()->route('items.index')->with('success', 'Item saved successfully!');
 }

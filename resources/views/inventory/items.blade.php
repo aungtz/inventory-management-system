@@ -199,7 +199,9 @@
                   <label class="block font-semibold mb-2 text-gray-700">Item Code <span class="text-red-500">*</span></label>
                   <input type="text" name="Item_Code" required
                          class="input-focus w-full p-3 rounded-xl border border-gray-300 focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-all duration-300">
-                </div>
+                   <p class="item-code-error text-red-500 text-sm mt-1 hidden"></p>
+
+                        </div>
 
                 <!-- JAN Code -->
                 <div class="transform transition-all duration-300 hover:scale-[1.02]">
@@ -465,6 +467,8 @@
 
 
   {{-- JavaScript: image handling + SKU modal + form submit --}}
+   <script src="{{ asset('js/validation/item-validation.js') }}?v={{ time() }}"></script>
+
 <script>
   // State
   const state = {
@@ -479,7 +483,8 @@
     setupSkuModal();
   });
 
-  function setupImageSlot(i) {
+
+function setupImageSlot(i) {
     const input = document.getElementById(`imageInput${i}`);
     const preview = document.getElementById(`imagePreview${i}`);
     const nameInput = document.getElementById(`imageName${i}`);
@@ -489,56 +494,54 @@
     btn.addEventListener('click', () => input.click());
 
     removeBtn.addEventListener('click', () => {
-      // Create a new file input to properly reset it
-      const newInput = input.cloneNode(true);
-      newInput.value = '';
-      input.parentNode.replaceChild(newInput, input);
-      
-      state.productImages[i] = null;
-      preview.innerHTML = '<div class="text-center"><svg class="w-8 h-8 text-gray-400 mx-auto mb-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"></path></svg><span class="text-gray-400 text-xs">No Image</span></div>';
-      nameInput.value = '';
+      input.value = "";               // reset file input
+      state.productImages[i] = null;  // clear state
+      preview.innerHTML = '<div class="text-center">No Image</div>';
+      nameInput.value = "";
       nameInput.disabled = true;
-      btn.textContent = 'Upload';
-      btn.className = 'btn-primary w-full px-3 py-2 text-sm text-white rounded-lg transition-all duration-300';
-      
-      setupImageSlot(i); // Re-setup event listeners
+      btn.textContent = "Upload";
+
+        state.productImages[i] = null;
+        preview.innerHTML = '<div class="text-center">No Image</div>';
+        nameInput.value = '';
+        nameInput.disabled = true;
+        btn.textContent = 'Upload';
+        
     });
 
     nameInput.addEventListener('input', () => {
-      if (!state.productImages[i]) state.productImages[i] = { file: null, name: '' };
-      state.productImages[i].name = nameInput.value;
+        if (!state.productImages[i]) state.productImages[i] = { file: null, name: '' };
+        state.productImages[i].name = nameInput.value;
     });
 
     input.addEventListener('change', (e) => {
-      const file = e.target.files[0];
-      if (!file) return;
+        const file = e.target.files[0];
+        if (!file) return;
 
-      // Check file size (max 2MB per image)
-      if (file.size > 2 * 1024 * 1024) {
-        alert('File size must be less than 2MB');
-        input.value = '';
-        return;
-      }
+        if (file.size > 2 * 1024 * 1024) { // max 2MB
+            alert('File size must be less than 2MB');
+            input.value = '';
+            return;
+        }
 
-      const reader = new FileReader();
-      reader.onload = function(ev) {
-        preview.innerHTML = `<img src="${ev.target.result}" class="w-full h-full object-cover rounded-xl" alt="Preview">`;
-      };
-      reader.readAsDataURL(file);
+        const reader = new FileReader();
+        reader.onload = function(ev) {
+            preview.innerHTML = `<img src="${ev.target.result}" class="w-full h-full object-cover rounded-xl" alt="Preview">`;
+        };
+        reader.readAsDataURL(file);
 
-      nameInput.disabled = false;
-      if (!nameInput.value) nameInput.value = file.name;
+        nameInput.disabled = false;
+        if (!nameInput.value) nameInput.value = file.name;
 
-      btn.textContent = 'Edit';
-      btn.className = 'bg-green-600 hover:bg-green-700 w-full px-3 py-2 text-sm text-white rounded-lg transition-all duration-300';
-
-      state.productImages[i] = {
-        file: file,
-        name: nameInput.value || file.name,
-        url: null
-      };
+        btn.textContent = 'Edit';
+        state.productImages[i] = {
+            file: file,
+            name: nameInput.value || file.name,
+            url: null
+        };
     });
-  }
+}
+
 
   function setupSkuModal() {
     const skuModal = document.getElementById('skuModal');
@@ -708,6 +711,9 @@ document.querySelectorAll('.price-input').forEach(input => {
       e.preventDefault();
       row.remove();
     });
+    attachSkuRowValidation(row);
+    // checkSkuValidation();
+
   }
 
   function renderSkuTable() {
@@ -762,6 +768,7 @@ document.querySelectorAll('.price-input').forEach(input => {
 }
 
 </script>
-<script src="{{ asset('js/validation/item-validation.js') }}"></script>
+<!-- <script src="{{ asset('js/validation/item-validation.js') }}"></script> -->
+
 </body>
 </html>

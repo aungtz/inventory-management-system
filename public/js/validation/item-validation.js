@@ -1,146 +1,169 @@
 // --------------------
 // Common Validation UI
 // --------------------
+function showAlert(message) {
+    let box = document.getElementById("alert-box");
+
+    if (!box) {
+        box = document.createElement("div");
+        box.id = "alert-box";
+        box.className = "fixed top-5 right-5 bg-red-500 text-white px-4 py-3 rounded-lg shadow-lg z-50";
+        document.body.appendChild(box);
+    }
+
+    box.textContent = message;
+    box.style.display = "block";
+
+    setTimeout(() => {
+        box.style.display = "none";
+    }, 1500);
+}
+
+
 function setValid(input) {
-    if (!input) return;
     input.classList.remove('border-red-500');
     input.classList.add('border-green-500');
-
-    const next = input.nextElementSibling;
-    if (next && next.classList.contains('error-msg')) {
-        next.remove();
-    }
 }
 
-function setInvalid(input, msg = '') {
-    if (!input) return;
+function setInvalid(input) {
     input.classList.remove('border-green-500');
     input.classList.add('border-red-500');
-
-    const next = input.nextElementSibling;
-    if (next && next.classList.contains('error-msg')) {
-        next.textContent = msg;
-        return;
-    }
-
-    const err = document.createElement('p');
-    err.className = 'error-msg text-red-500 text-sm mt-1';
-    err.textContent = msg;
-    input.parentNode.appendChild(err);
 }
-
 function validateRequiredText(input, maxLength = 100) {
     const val = input.value.trim();
+    input.value = val;
 
     if (!val) {
-        setInvalid(input, 'This field is required');
-    } else if (val.length > maxLength) {
-        input.value = val.substring(0,100)
-        setInvalid(input, `Cannot exceed ${maxLength} characters`);
-    } else {
-        setValid(input);
+        setInvalid(input);
+        showAlert("This field is required");
+        return false;
     }
+
+    if (val.length > maxLength) {
+        input.value = val.substring(0, maxLength);
+        setInvalid(input);
+        showAlert(`Max ${maxLength} characters allowed`);
+        return false;
+    }
+
+    setValid(input);
+    return true;
 }
 
 
-document.addEventListener("DOMContentLoaded", () => {
-
-    const itemCode = document.querySelector('input[name="Item_Code"]');
-
-    itemCode.addEventListener('input', () => {
-        validateItemCode(itemCode);
-    });
-
-});
-
 function validateItemCode(input) {
-    // Remove spaces live
-    const cleaned = input.value.replace(/\s+/g, '');
+    let cleaned = input.value.replace(/\s+/g, '');
 
     if (cleaned !== input.value) {
         input.value = cleaned;
-        setInvalid(input, "Spaces are not allowed");
-        return;
+        setInvalid(input);
+        showAlert("Spaces are not allowed in Item Code");
+        return false;
     }
 
-    // Check empty
     if (cleaned.length === 0) {
-        setInvalid(input, "Item Code is required");
-        return;
+        setInvalid(input);
+        showAlert("Item Code is required");
+        return false;
     }
 
-    // If all good
     setValid(input);
+    return true;
 }
 function validateMemo(input) {
-    let val = input.value;
-
-    // Remove leading spaces
-    val = val.replace(/^\s+/g, '');
+    let val = input.value.replace(/^\s+/g, '');
     input.value = val;
- if (val.length === 0) {
-        setInvalid(input, "Memo cannot be empty.");
-        return;
+
+    if (val.length === 0) {
+        setInvalid(input);
+        showAlert("Memo cannot be empty");
+        return false;
     }
-    // Max 200 chars
+
     if (val.length > 200) {
         input.value = val.substring(0, 200);
-        setInvalid(input, 'Memo cannot exceed 200 characters');
-        return;
+        setInvalid(input);
+        showAlert("Memo cannot exceed 200 characters");
+        return false;
     }
 
-    // Valid
     setValid(input);
+    return true;
 }
-
-
 function validateJanCode(input) {
-    let val = input.value.replace(/\D/g, ''); // only digits
+    let val = input.value.replace(/\D/g, '');
+
+    // ❗ If first digit is 0 — block it
+    if (val.startsWith('0')) {
+        showAlert("JAN cannot start with 0");
+        val = val.substring(1); // remove the zero
+    }
+
     input.value = val;
 
+    // Empty
+    if (val.length === 0) {
+        setInvalid(input);
+        return false;
+    }
+
+    // Must be 13 digits
     if (val.length !== 13) {
-        setInvalid(input, 'JAN must be 13 digits');
-    } else if (val.startsWith('0')) {
-        setInvalid(input, 'JAN cannot start with 0');
+        setInvalid(input);
+        showAlert("JAN must be 13 digits");
+        return false;
+    }
+
+    setValid(input);
+    return true;
+}
+
+function validatePrice(input) {
+    let raw = input.value.replace(/,/g, '').replace(/\D/g, '');
+
+    if (!raw) {
+        setInvalid(input);
+        showAlert("Price must be a number");
+        return false;
+    }
+
+    raw = raw.slice(0, 9);
+    input.value = Number(raw).toLocaleString('ja-JP');
+    input.style.textAlign = 'right';
+
+    setValid(input);
+    return true;
+}
+function validateSkuDigits(input) {
+    input.value = input.value.replace(/\D/g, '');
+
+    if (input.value === '') {
+        setInvalid(input);
+        showAlert('Digits only — this field cannot be empty.');
     } else {
         setValid(input);
     }
-}
-
-function validatePrice(input, maxDigits = 9) {
-    if (!input || !input.value) return;
-
-    let rawVal = input.value.replace(/,/g, '').replace(/\D/g, '');
-    if (rawVal === '') {
-        setInvalid(input, 'Must be a number');
-        return;
-    }
-
-    rawVal = rawVal.slice(0, maxDigits);
-    input.value = Number(rawVal).toLocaleString('ja-JP');
-    input.style.textAlign = 'right';
-    setValid(input);
-}
-
-function validateSkuDigits(input) {
-    input.value = input.value.replace(/\D/g, '');
-    if (input.value === '') setInvalid(input, 'Numbers only');
-    else setValid(input);
 }
 
 function validateSkuJan(input) {
     const digits = input.value.replace(/\D/g, '');
     input.value = digits;
 
-    if (digits.length === 0) setInvalid(input, 'Required');
-    else if (digits.length !== 13) setInvalid(input, 'Must be 13 digits');
-    else if (digits.startsWith('0')) setInvalid(input, 'Cannot start with 0');
-    else setValid(input);
-}
-
-function validateSelect(input) {
-    if (!input.value || input.value === '---') setInvalid(input, 'Select one');
-    else setValid(input);
+    if (digits.length === 0) {
+        setInvalid(input);
+        showAlert('JAN code is required.');
+    }
+    else if (digits.length !== 13) {
+        setInvalid(input);
+        showAlert('JAN code must be exactly 13 digits.');
+    }
+    else if (digits.startsWith('0')) {
+        setInvalid(input);
+        showAlert('JAN code cannot start with 0.');
+    }
+    else {
+        setValid(input);
+    }
 }
 
 function validateSkuRow(row) {
@@ -151,48 +174,41 @@ function validateSkuRow(row) {
     const janCode = row.querySelector('.jan-code');
     const stock = row.querySelector('.stock-quantity');
 
-    // Required fields
-    if (!sizeName.value.trim()) setInvalid(sizeName, 'Required'); else setValid(sizeName);
-    if (!colorName.value.trim()) setInvalid(colorName, 'Required'); else setValid(colorName);
-    if (!sizeCode.value.trim()) setInvalid(sizeCode, 'Required'); else setValid(sizeCode);
-    if (!colorCode.value.trim()) setInvalid(colorCode, 'Required'); else setValid(colorCode);
+    // Size Name
+    if (!sizeName.value.trim()) {
+        setInvalid(sizeName);
+        showAlert('Size Name is required.');
+    } else setValid(sizeName);
 
-    // JAN code validation
+    // Color Name
+    if (!colorName.value.trim()) {
+        setInvalid(colorName);
+        showAlert('Color Name is required.');
+    } else setValid(colorName);
+
+    // Size Code
+    if (!sizeCode.value.trim()) {
+        setInvalid(sizeCode);
+        showAlert('Size Code is required.');
+    } else setValid(sizeCode);
+
+    // Color Code
+    if (!colorCode.value.trim()) {
+        setInvalid(colorCode);
+        showAlert('Color Code is required.');
+    } else setValid(colorCode);
+
+    // JAN Code
     validateSkuJan(janCode);
 
-    // Stock ≥ 0
-    if (stock.value === '' || isNaN(stock.value) || Number(stock.value) < 0) setInvalid(stock, 'Invalid');
-    else setValid(stock);
+    // Stock
+    if (stock.value === '' || isNaN(stock.value) || Number(stock.value) < 0) {
+        setInvalid(stock);
+        showAlert('Stock must be a number and cannot be negative.');
+    } else {
+        setValid(stock);
+    }
 }
-
-
-// if validation not meet submit button will be disable functions
-
-
-// const saveBtn = document.getElementById('saveSkusBtn');
-// saveBtn.disabled = true;
-// saveBtn.classList.add('opacity-50', 'cursor-not-allowed');
-
-// function checkSkuValidation() {
-//     const rows = document.querySelectorAll('.sku-row');
-//     let allValid = true;
-
-//     rows.forEach(row => {
-//         // Validate each row
-//         validateSkuRow(row);
-
-//         // If any input has red border, mark as invalid
-//         const invalidInput = row.querySelector('.border-red-500');
-//         if (invalidInput) allValid = false;
-//     });
-
-//     // Enable/disable button
-//     saveBtn.disabled = !allValid;
-//     saveBtn.classList.toggle('opacity-50', !allValid);
-//     saveBtn.classList.toggle('cursor-not-allowed', !allValid);
-// }
-
-
 // --------------------
 // DOM Loaded
 // --------------------
@@ -245,10 +261,6 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     });
 
-//     // document.querySelectorAll('.sku-row input, .sku-row select').forEach(input => {
-//     // input.addEventListener('input', checkSkuValidation);
-//     // input.addEventListener('blur', checkSkuValidation);
-// });
 
 });
 

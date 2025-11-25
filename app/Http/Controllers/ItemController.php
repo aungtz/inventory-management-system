@@ -95,21 +95,23 @@ public function exportAll()
     ]);
 
     // CREATE SKUs FROM JSON
-    if ($request->has('skus_json') && !empty($request->skus_json)) {    
-        $skusData = json_decode($request->skus_json, true);
-        
-        // CREATE SKUs FROM JSON
-if ($request->filled('skus_json')) {
+   if ($request->filled('skus_json')) {
 
+    // Decode only ONCE
     $skusData = json_decode($request->skus_json, true);
 
     if (is_array($skusData)) {
         foreach ($skusData as $skuData) {
+
+            // Ensure value exists and pad to 4 digits
+            $colorCode = isset($skuData['colorCode']) ? str_pad((string)$skuData['colorCode'], 4, '0', STR_PAD_LEFT) : null;
+            $sizeCode  = isset($skuData['sizeCode']) ? str_pad((string)$skuData['sizeCode'], 4, '0', STR_PAD_LEFT) : null;
+
             $item->skus()->create([
                 'Size_Name'   => $skuData['sizeName'] ?? null,
                 'Color_Name'  => $skuData['colorName'] ?? null,
-                'Size_Code'   => $skuData['sizeCode'] ?? null,
-                'Color_Code'  => $skuData['colorCode'] ?? null,
+                'Size_Code'   => $sizeCode,
+                'Color_Code'  => $colorCode,
                 'JanCode'     => $skuData['janCode'] ?? null,
                 'Quantity'    => $skuData['stockQuantity'] ?? 0,
                 'CreatedBy'   => auth()->user()->name ?? 'system',
@@ -119,7 +121,6 @@ if ($request->filled('skus_json')) {
     }
 }
 
-    }
 
   if ($request->hasFile('images')) {
     foreach ($request->file('images') as $index => $image) {
@@ -199,5 +200,24 @@ if ($request->filled('skus_json')) {
 
         return redirect()->route('items.index')->with('success', 'Item updated successfully');
     }
+
+  public function destroy($Item_Code)
+{
+    // 1) Get item
+    $item = Item::where('Item_Code', $Item_Code)->firstOrFail();
+
+    // 2) Delete SKUs
+    $item->skus()->delete();
+
+    // 3) Delete Images
+    $item->images()->delete();
+
+    // 4) Delete Item
+    $item->delete();
+
+    return back()->with('success', 'Item deleted successfully!');
+}
+
+
 
 }

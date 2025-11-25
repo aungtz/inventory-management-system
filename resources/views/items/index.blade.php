@@ -331,56 +331,51 @@
 
 
 
-<div class="lg:px-6 lg:py-4 lg:border-r border-gray-100 pt-4 lg:pt-0">
-    <div class="space-y-4">
-        {{-- Total Stock Card & Toggle Button --}}
-        <div class="p-4 rounded-xl bg-indigo-50 border border-indigo-200 shadow-lg">
-            <div class="flex justify-between items-center mb-1">
-                {{-- ... Stock Title ... --}}
-                
-                @if($skuCount > 0)
-                    {{-- item ၏ သက်ဆိုင်ရာ Pivot Data ကို ဤနေရာတွင် စစ်ထုတ်သည် --}}
-                    @php
-                        // $pivotSkus ကို controller မှ ပို့ထားပြီး၊ $item သည် loop အတွင်းမှဖြစ်မည်။
-                        $itemPivotSkus = collect($pivotSkus)->where('Item_Code', $item->Item_Code)->values();
-                    @endphp
+                            <div class="lg:px-6 lg:py-4 lg:border-r border-gray-100 pt-4 lg:pt-0">
+                                <div class="space-y-4">
+                                    {{-- Total Stock Card & Toggle Button --}}
+                                    <div class="p-4 rounded-xl bg-indigo-50 border border-indigo-200 shadow-lg">
+                                        <div class="flex justify-between items-center mb-1">
+                                            {{-- ... Stock Title ... --}}
+                                            
+                                            @if($skuCount > 0)
+                                                {{-- item ၏ သက်ဆိုင်ရာ Pivot Data ကို ဤနေရာတွင် စစ်ထုတ်သည် --}}
+                                                @php
+                                                    // $pivotSkus ကို controller မှ ပို့ထားပြီး၊ $item သည် loop အတွင်းမှဖြစ်မည်။
+                                                    $itemPivotSkus = collect($pivotSkus)->where('Item_Code', $item->Item_Code)->values();
+                                                @endphp
 
-                 <button
-                        onclick="showSkuTable(this, '{{ $item->Item_Code }}')" {{-- function အသစ်ကို ခေါ်ပြီး Item Code ကို ထည့်ပေးသည် --}}
-                        data-pivot-skus="{{ urlencode(json_encode($itemPivotSkus)) }}"
-                        class="text-indigo-500 hover:text-indigo-700 p-1 rounded hover:bg-indigo-100"
-                    >
-                        <i class="fas fa-eye"></i> View SKUs
-                    </button>
-                @endif
-            </div>
-            
-            <p class="font-extrabold text-4xl mt-1 {{ $totalStock > 0 ? 'text-indigo-800' : 'text-red-600' }}">
-                {{ $totalStock }}
-            </p>
-        </div>
-        
-        {{-- Modal Structure --}}
-        <div 
-            id="skuTableContainer-{{ $item->Item_Code }}" {{-- Item Code ဖြင့် ID ပေးသည် --}}
-            class="p-4 rounded-xl border border-gray-200 shadow-sm hidden" {{-- စစချင်းမှာ ဝှက်ထားသည် --}}
-        >
-            <h3 class="text-lg font-semibold text-gray-700 mb-3">SKU Details (Pivot)</h3>
-            
-            {{-- Table ကို ထည့်သွင်းရန် နေရာ --}}
-            <div id="skuTableContent-{{ $item->Item_Code }}" 
-                 class="space-y-2 max-h-96 overflow-y-auto" {{-- Scrollbar ပါရှိသည် --}}
-            >
-                </div>
-        </div>
-    </div>
-</div>
+                                            <button
+                                                    onclick="showSkuTable(this, '{{ $item->Item_Code }}')" {{-- function အသစ်ကို ခေါ်ပြီး Item Code ကို ထည့်ပေးသည် --}}
+                                                    data-pivot-skus="{{ urlencode(json_encode($itemPivotSkus)) }}"
+                                                    class="text-indigo-500 hover:text-indigo-700 p-1 rounded hover:bg-indigo-100"
+                                                >
+                                                    <i class="fas fa-eye"></i> View SKUs
+                                                </button>
+                                            @endif
+                                        </div>
+                                        
+                                        <p class="font-extrabold text-4xl mt-1 {{ $totalStock > 0 ? 'text-indigo-800' : 'text-red-600' }}">
+                                            {{ $totalStock }}
+                                        </p>
+                                    </div>
                                     
-                               
-
-
-
-                                    
+                                    {{-- Modal Structure --}}
+                                    <div 
+                                        id="skuTableContainer-{{ $item->Item_Code }}" {{-- Item Code ဖြင့် ID ပေးသည် --}}
+                                        class="p-4 rounded-xl border border-gray-200 shadow-sm hidden" {{-- စစချင်းမှာ ဝှက်ထားသည် --}}
+                                    >
+                                        <h3 class="text-lg font-semibold text-gray-700 mb-3">SKU Details (Pivot)</h3>
+                                        
+                                        {{-- Table ကို ထည့်သွင်းရန် နေရာ --}}
+                                        <div id="skuTableContent-{{ $item->Item_Code }}" 
+                                            class="space-y-2 max-h-96 overflow-y-auto" {{-- Scrollbar ပါရှိသည် --}}
+                                        >
+                                            </div>
+                                    </div>
+                                </div>
+                            </div>
+                                                                
                                     {{-- Pricing Metrics --}}
                                     <div class="grid grid-cols-2 gap-3 text-sm">
                                         <div class="p-3 rounded-lg bg-white border border-gray-100 shadow-sm">
@@ -396,7 +391,8 @@
                             </div>
 
                             <!-- 4. Actions -->
-                            <div class="lg:px-6 lg:py-4 pt-4 lg:pt-0">
+                            <div class="lg:px-6 lg:py-4 pt-4 lg:pt-0" style="
+    margin-top: 15px;">
                                 <div class="flex flex-col space-y-3">
                                     <a href="" 
                                        class="bg-gradient-to-r from-blue-500 to-cyan-500 hover:from-blue-600 hover:to-cyan-600 text-white px-4 py-3 rounded-xl transition-all duration-200 flex items-center justify-center gap-2 font-semibold shadow-md transform hover:scale-[1.02]">
@@ -404,7 +400,8 @@
                                         Edit
                                     </a>
                                     <button type="button" 
-                                            onclick="confirmDelete({{ $item->id }})"
+                                            onclick="confirmDelete(`{{ $item->Item_Code }}`, `{{ e($item->Item_Name) }}`)"
+
                                             class="bg-gradient-to-r from-red-500 to-pink-500 hover:from-red-600 hover:to-pink-600 text-white px-4 py-3 rounded-xl transition-all duration-200 flex items-center justify-center gap-2 font-semibold shadow-md transform hover:scale-[1.02]">
                                         <i class="fas fa-trash"></i>
                                         Delete
@@ -510,6 +507,43 @@
             </div>
         </div>
     </div>
+
+    <!-- Delete Confirmation Modal -->
+<div id="deleteModal"
+     class="fixed inset-0 bg-black/50 flex items-center justify-center hidden z-50">
+    <div class="bg-white w-[400px] p-6 rounded-xl shadow-lg space-y-4">
+        
+        <h2 class="text-xl font-bold text-red-600">Confirm Delete</h2>
+
+        <p class="text-gray-700">
+            Are you sure you want to delete this item?
+        </p>
+
+        <div class="bg-gray-100 p-3 rounded-md">
+            <p><strong>ID:</strong> <span id="deleteItemId"></span></p>
+            <p><strong>Name:</strong> <span id="deleteItemName"></span></p>
+        </div>
+
+        <form id="deleteForm" method="POST">
+            @csrf
+            @method('DELETE')
+
+            <div class="flex justify-end gap-2 mt-4">
+                <button type="button"
+                        onclick="closeDeleteModal()"
+                        class="px-4 py-2 bg-gray-300 rounded-lg hover:bg-gray-400">
+                    Cancel
+                </button>
+
+                <button type="submit"
+                        class="px-4 py-2 bg-red-500 text-white rounded-lg hover:bg-red-600">
+                    Confirm Delete
+                </button>
+            </div>
+        </form>
+    </div>
+</div>
+
     
     <script>
 
@@ -797,9 +831,22 @@ function openImageGalleryFromElement(el) {
         });
 
         // Placeholder for confirmDelete function (since it's not defined)
-        function confirmDelete(itemId) {
-            console.log(`Delete confirmation needed for item ID: ${itemId}`);
-        }
+      function confirmDelete(id, name) {
+    // show modal
+    document.getElementById('deleteModal').classList.remove('hidden');
+
+    // show data inside modal
+    document.getElementById('deleteItemId').textContent = id;
+    document.getElementById('deleteItemName').textContent = name;
+
+    // set form action
+    document.getElementById('deleteForm').action = `/items/${id}`;
+}
+
+function closeDeleteModal() {
+    document.getElementById('deleteModal').classList.add('hidden');
+}
+
         
         // Simple client-side search functionality
         document.getElementById('searchInput').addEventListener('keyup', function() {

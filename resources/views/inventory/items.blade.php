@@ -428,7 +428,7 @@
               <th class="p-4 border-r border-white/20 font-semibold">Size Code</th>
               <th class="p-4 border-r border-white/20 font-semibold">Color Code</th>
               <th class="p-4 border-r border-white/20 font-semibold">JAN Code</th>
-              <th class="p-4 border-r border-white/20 font-semibold">Qty-flag</th>
+              <th class="p-4 border-r border-white/20 font-semibold **w-40**">Qty-flag</th>
               <th class="p-4 font-semibold">Number in Stock</th>
             </tr>
           </thead>
@@ -697,13 +697,13 @@ document.querySelectorAll('.price-input').forEach(input => {
                value="${skuData.janCode || ''}" placeholder="JAN code">
       </td>
       <td class="p-3 border-r">
-        <select class="qty-flag w-full p-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-all duration-200">
-          <option value="true" ${skuData.qtyFlag === 'true' ? 'selected' : ''}>Yes</option>
-          <option value="false" ${skuData.qtyFlag === 'false' || !skuData.qtyFlag ? 'selected' : ''}>No</option>
-        </select>
+        <select class="qty-flag **w-full** p-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-all duration-200">
+        <option value="true" ${skuData.qtyFlag === 'true' ? 'selected' : ''}>Yes</option>
+        <option value="false" ${skuData.qtyFlag === 'false' || !skuData.qtyFlag ? 'selected' : ''}>No</option>
+    </select>
       </td>
       <td class="p-3">
-        <input type="number" class="stock-quantity w-full p-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-all duration-200" 
+        <input type="number" class="stock-quantity text-right w-full p-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-all duration-200" 
                value="${skuData.stockQuantity || '0'}" placeholder="0" min="0">
       </td>
     `;
@@ -714,6 +714,7 @@ document.querySelectorAll('.price-input').forEach(input => {
       row.remove();
     });
     attachSkuRowValidation(row);
+    
     // checkSkuValidation();
 
   }

@@ -80,6 +80,9 @@ Route::get('/check-item-code', function (Request $request) {
     return response()->json(['exists' => $exists]);
 });
 
+Route::delete('/items/{id}', [ItemController::class, 'destroy'])->name('items.destroy');
+
+
 Route::get('/export-items', [ItemController::class, 'exportItems'])->name('export.items');
 Route::get('/export-skus', [ItemController::class, 'exportSkus'])->name('export.skus');
 Route::get('/export-all', [ItemController::class, 'exportAll'])->name('export.all');

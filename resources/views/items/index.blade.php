@@ -82,11 +82,11 @@
 
                 <!-- Export Buttons (Kept for completeness) -->
            <div class="flex flex-wrap gap-2 w-full lg:w-auto">
-    <button id="importBtn"
+    <!-- <button id="importBtn"
         class="bg-gray-500 hover:bg-gray-600 text-white px-4 py-3 rounded-xl transition-all duration-200 transform hover:scale-105 flex items-center gap-2 font-medium">
         <i class="fas fa-file-import"></i>
         Import
-    </button>
+    </button> -->
   <a href="{{ route('export.all') }}"
    class="bg-green-500 hover:bg-green-600 text-white px-4 py-3 rounded-xl transition-all duration-200 transform hover:scale-105 flex items-center gap-2 font-medium">
    <i class="fas fa-file-excel"></i>

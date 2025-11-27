@@ -142,15 +142,32 @@ function validatePrice(input,maxDigits) {
     return true;
 }
 function validateSkuDigits(input) {
-    input.value = input.value.replace(/\D/g, '');
+    if (!input) return;
 
-    if (input.value === '') {
-        setInvalid(input);
-        showAlert('Digits only — this field cannot be empty.');
-    } else {
-        setValid(input);
+    // Always strip non-digits
+    let digits = input.value.replace(/\D/g, '');
+
+    // Block leading zero
+    if (digits.startsWith('0')) {
+        showAlert("Value cannot start with 0");
+        digits = digits.substring(1);
     }
+
+    // Update field
+    input.value = digits;
+
+    // Empty → invalid
+    if (digits.length === 0) {
+        setInvalid(input);
+        showAlert("This field cannot be empty and must contain digits only.");
+        return false;
+    }
+
+    // If all OK
+    setValid(input);
+    return true;
 }
+
 
 function validateSkuJan(input) {
     let digits = input.value.replace(/\D/g, '');

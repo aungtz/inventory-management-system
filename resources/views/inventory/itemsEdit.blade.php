@@ -711,7 +711,6 @@ if (duplicateFound) {
     skuModalBody.innerHTML = '';
 
     state.skus.forEach(sku => addSkuRow(sku));
-
     if (state.skus.length === 0) addSkuRow();
 }
 
@@ -748,11 +747,10 @@ document.querySelectorAll('.price-input').forEach(input => {
     });
 });
 
-
-
  function addSkuRow(skuData = {}) {
     const rowId = Date.now(); // unique row ID
     const row = document.createElement('tr');
+    const isQtyFlagTrue = skuData.qtyFlag === true || skuData.Quantity > 0;
     row.className = 'sku-row border-b border-gray-200 hover:bg-gray-50/50 transition-all duration-200';
     row.innerHTML = `
         <td class="p-3 border-r">
@@ -761,24 +759,24 @@ document.querySelectorAll('.price-input').forEach(input => {
             </button>
         </td>
         <td class="p-3 border-r">
-            <input type="text" class="size-name w-full p-2 border rounded-lg" value="${skuData.sizeName || ''}" placeholder="Enter size name">
+            <input type="text" class="size-name w-full p-2 border rounded-lg" value="${skuData.sizeName || ''}" placeholder="Enter size name" name="skus[size_name][]">
         </td>
         <td class="p-3 border-r">
-            <input type="text" class="color-name w-full p-2 border rounded-lg" value="${skuData.colorName || ''}" placeholder="Enter color name">
+            <input type="text" class="color-name w-full p-2 border rounded-lg" value="${skuData.colorName || ''}" placeholder="Enter color name" name="skus[color_name][]">
         </td>
         <td class="p-3 border-r">
-            <input type="text" class="size-code w-full p-2 border rounded-lg" value="${skuData.sizeCode || ''}" placeholder="Size code">
+            <input type="text" class="size-code w-full p-2 border rounded-lg" value="${skuData.sizeCode || ''}" placeholder="Size code"  name="skus[color_code][]">
         </td>
         <td class="p-3 border-r">
-            <input type="text" class="color-code w-full p-2 border rounded-lg" value="${skuData.colorCode || ''}" placeholder="Color code">
+            <input type="text" class="color-code w-full p-2 border rounded-lg" value="${skuData.colorCode || ''}" placeholder="Color code"  name="skus[jan][]">
         </td>
         <td class="p-3 border-r">
-            <input type="text" class="jan-code w-full p-2 border rounded-lg" value="${skuData.janCode || ''}" placeholder="JAN code">
+            <input type="text" class="jan-code w-full p-2 border rounded-lg" value="${skuData.janCode || ''}" placeholder="JAN code" name="skus[stock][]">
         </td>
         <td class="p-3 border-r">
         <select class="qty-flag **w-full** p-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-all duration-200">
-                <option value="true" ${skuData.Quantity > 0 ? 'selected' : ''}>Yes</option>
-                <option value="false" ${skuData.Quantity == 0 ? 'selected' : ''}>No</option>
+                <option value="true" ${isQtyFlagTrue  ? 'selected' : ''}>Yes</option>
+                <option value="false" ${!isQtyFlagTrue ? 'selected' : ''}>No</option>
             </select>
         </td>
         <td class="p-3">
@@ -790,6 +788,19 @@ document.querySelectorAll('.price-input').forEach(input => {
     // delete button
     row.querySelector('.delete-row-btn').addEventListener('click', () => row.remove());
 }
+
+document.querySelectorAll('.image-name').forEach(input => {
+    input.addEventListener('blur', () => {
+        let name = input.value.trim();
+
+        if (!name) return;
+
+        if (!/\.(jpg|jpeg|png|gif|svg)$/i.test(name)) {
+            input.value = name + ".jpg";
+        }
+    });
+});
+
 
 function loadExistingSkusIntoModal() {
     const skuModalBody = document.getElementById("skuModalBody");

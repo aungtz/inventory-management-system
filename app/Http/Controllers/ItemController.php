@@ -165,11 +165,14 @@ public function exportAll()
     return redirect()->route('items.index')->with('success', 'Item saved successfully!');
 }
 
- public function edit($id)
-    {
-        $item = Item::with('skus', 'images')->findOrFail($id);
-    return view('inventory.itemEdit', compact('item'));
-    }
+public function edit($id)
+{
+    $item = Item::with(['skus', 'images'])->findOrFail($id);
+
+        return view('inventory.itemsEdit', compact('item'));
+
+}
+
 
     // Update existing item
     public function update(Request $request, $id)

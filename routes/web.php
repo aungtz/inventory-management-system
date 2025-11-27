@@ -81,6 +81,23 @@ Route::get('/check-item-code', function (Request $request) {
 });
 
 Route::delete('/items/{id}', [ItemController::class, 'destroy'])->name('items.destroy');
+Route::get('/items/{id}/edit', [ItemController::class, 'edit'])->name('items.edit');
+Route::put('/items/{id}', [ItemController::class, 'update'])->name('items.update');
+
+
+Route::get('/check-itemcode', function (\Illuminate\Http\Request $request) {
+    $itemCode = $request->query('item_code');
+    $id = $request->query('id'); // current item ID when editing
+
+    $query = \App\Models\Item::where('Item_Code', $itemCode);
+
+    if ($id) {
+        // exclude current item during edit
+        $query->where('id', '!=', $id);
+    }
+
+    return ['exists' => $query->exists()];
+});
 
 
 Route::get('/export-items', [ItemController::class, 'exportItems'])->name('export.items');

@@ -90,6 +90,7 @@ function validateMemo(input) {
     setValid(input);
     return true;
 }
+
 function validateJanCode(input) {
     let val = input.value.replace(/\D/g, '');
 
@@ -104,6 +105,8 @@ function validateJanCode(input) {
     // Empty
     if (val.length === 0) {
         setInvalid(input);
+                showAlert("JAN cannot be empty");
+
         return false;
     }
 
@@ -118,16 +121,20 @@ function validateJanCode(input) {
     return true;
 }
 
-function validatePrice(input) {
+function validatePrice(input,maxDigits) {
     let raw = input.value.replace(/,/g, '').replace(/\D/g, '');
 
     if (!raw) {
         setInvalid(input);
-        showAlert("Price must be a number");
+        showAlert("Price must be a number and canot be empty");
         return false;
     }
+    if(raw.length > maxDigits){
+        raw =raw.slice(0,maxDigits);
+        showAlert(`Price cannot exceed ${maxDigits} digits`);
+    }
 
-    raw = raw.slice(0, 9);
+    
     input.value = Number(raw).toLocaleString('ja-JP');
     input.style.textAlign = 'right';
 
@@ -146,25 +153,40 @@ function validateSkuDigits(input) {
 }
 
 function validateSkuJan(input) {
-    const digits = input.value.replace(/\D/g, '');
+    let digits = input.value.replace(/\D/g, '');
+
+    // ❌ Don't allow first digit = 0
+    if (digits.startsWith("0")) {
+        showAlert("JAN cannot start with 0");
+        digits = digits.substring(1); // remove the leading zero
+    }
+
+    // ❌ Limit to 13 digits max
+    if (digits.length > 13) {
+        digits = digits.substring(0, 13); // cut extra digits
+        showAlert("JAN cannot be more than 13 digits");
+    }
+
     input.value = digits;
 
+    // ❌ If empty → invalid
     if (digits.length === 0) {
         setInvalid(input);
-        showAlert('JAN code is required.');
+        showAlert("SKU JanCd is  cannot be empty. ")
+        return false;
     }
-    else if (digits.length !== 13) {
-        setInvalid(input);
-        showAlert('JAN code must be exactly 13 digits.');
-    }
-    else if (digits.startsWith('0')) {
-        setInvalid(input);
-        showAlert('JAN code cannot start with 0.');
-    }
-    else {
+
+    // ❗ Exactly 13 digits = valid
+    if (digits.length === 13) {
         setValid(input);
+        return true;
     }
+
+    // Otherwise incomplete → invalid
+    setInvalid(input);
+    return false;
 }
+
 
 function validateSkuRow(row) {
     const sizeName = row.querySelector('.size-name');
@@ -299,5 +321,5 @@ function sanitizeAllSkuFields() {
 
 document.getElementById('saveSkusBtn').addEventListener('click', () => {
     sanitizeAllSkuFields();
-    closeSkuModal();
+    // closeSkuModal();
 });

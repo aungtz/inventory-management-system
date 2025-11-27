@@ -227,7 +227,9 @@
                                 </div>
                                 <div class="mt-2 lg:mt-3">
                                     <span class="text-xs font-semibold text-gray-500 uppercase tracking-wide">Code</span>
+                                    <a href="{{ route('items.edit', $item->Item_Code) }}">
                                     <p class="font-bold text-gray-800 text-base">{{ $item->Item_Code ?? '-' }}</p>
+                               </a>
                                 </div>
                             </div>
 
@@ -237,7 +239,9 @@
                                     {{-- Item Name - Main Focus --}}
                                     <div class="pb-2 border-b-2 border-indigo-100">
                                         <span class="text-xs font-semibold text-gray-500 uppercase tracking-wider">Product Name</span>
+                                     <a href="{{ route('items.edit', $item->Item_Code) }}">
                                         <p class="font-extrabold text-2xl text-gray-800 mt-1">{{ $item->Item_Name ?? '-' }}</p>
+</a>
                                     </div>
 
                                     {{-- JAN / Maker Details --}}
@@ -394,11 +398,12 @@
                             <div class="lg:px-6 lg:py-4 pt-4 lg:pt-0" style="
     margin-top: 15px;">
                                 <div class="flex flex-col space-y-3">
-                                    <a href="" 
-                                       class="bg-gradient-to-r from-blue-500 to-cyan-500 hover:from-blue-600 hover:to-cyan-600 text-white px-4 py-3 rounded-xl transition-all duration-200 flex items-center justify-center gap-2 font-semibold shadow-md transform hover:scale-[1.02]">
-                                        <i class="fas fa-edit"></i>
-                                        Edit
-                                    </a>
+                                   <a href="{{ route('items.edit', $item->Item_Code) }}"
+   class="bg-gradient-to-r from-blue-500 to-cyan-500 hover:from-blue-600 hover:to-cyan-600 text-white px-4 py-3 rounded-xl transition-all duration-200 flex items-center justify-center gap-2 font-semibold shadow-md transform hover:scale-[1.02]">
+    <i class="fas fa-edit"></i>
+    Edit
+</a>
+
                                     <button type="button" 
                                             onclick="confirmDelete(`{{ $item->Item_Code }}`, `{{ e($item->Item_Name) }}`)"
 

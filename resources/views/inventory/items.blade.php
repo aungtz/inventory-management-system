@@ -225,7 +225,7 @@
                 <!-- Item Code -->
                <div class="transform transition-all duration-300 hover:scale-[1.02]">
   <label class="block font-semibold mb-2 text-gray-700 text-sm">Item Code <span class="text-red-500">*</span></label>
-  <input type="text" name="Item_Code" required
+  <input type="text" name="Item_Code" id="Item_Code" required
          class="input-focus w-full p-3 rounded-xl border border-gray-300 focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-all duration-300 text-sm">
    <p class="item-code-error text-red-500 text-xs mt-1 hidden"></p>
 </div>
@@ -573,23 +573,34 @@
 
 
 
-  window.state  = window.state || {};
-  window.state.productImages = window.state.productImages || [];
+// Ensure a global state array exists
+window.state = window.state || {};
+window.state.productImages = window.state.productImages || []; // index => { file, name, url }
 
-  function padSerial(n, width = 3){
-    return String(n).padStart(width,'0');
-  }
-  function slugifyForFilename(text){
-    if(!text) return 'image';
-    return String(text)
+// Utility: pad number to 3 digits
+function padSerial(n, width = 3) {
+  return String(n).padStart(width, '0');
+}
+
+// Utility: normalize item code / name for filename (remove spaces, lower/upper, keep safe chars)
+function slugifyForFilename(text) {
+  if (!text) return 'image';
+  return String(text)
     .trim()
-    .replace(/\s+/g, '-')
-     .replace(/[^a-zA-Z0-9\-_]/g, '')// remove odd chars  }
-     .toLowerCause();
-  }
+    .replace(/\s+/g, '-')           // spaces -> hyphen
+    .replace(/[^a-zA-Z0-9\-_]/g, '')// remove odd chars
+    .toLowerCase();
+}
 
- function setupImageSlot(i, option = {}){
-   const input = document.getElementById(`imageInput${i}`);
+/**
+ * options:
+ *  - itemCodeSelector (string) e.g. '#Item_Code'
+ *  - itemNameSelector (string) e.g. '#Item_Name'
+ *  - padWidth (number) e.g. 3
+ *  - forceAutoName (bool) if true, user cannot edit name
+ */
+function setupImageSlot(i, options = {}) {
+  const input = document.getElementById(`imageInput${i}`);
   const preview = document.getElementById(`imagePreview${i}`);
   const nameInput = document.getElementById(`imageName${i}`);
   const btn = document.getElementById(`imageBtn${i}`);
@@ -600,78 +611,102 @@
   const padWidth = options.padWidth || 3;
   const forceAutoName = options.forceAutoName ?? false;
 
-  if(!window.state.productImages[i] ) window.state.productImages[i] = null;
+  // Ensure slot state exists
+  if (!window.state.productImages[i]) window.state.productImages[i] = null;
 
-  btn.addEventListener('click',() => input.click());
+  // click proxy
+  btn.addEventListener('click', () => input.click());
 
-  removeBtn.addEventLisener('click', () => {
-    input.value = "";
-    window.state.productImages[i] = null ; 
-    preview.innerHTML = '<div class = "text-center"> No Image </div>';
+  // remove / reset
+  removeBtn.addEventListener('click', () => {
+    input.value = "";               // reset file input
+    window.state.productImages[i] = null;  // clear state
+    preview.innerHTML = '<div class="text-center">No Image</div>';
     nameInput.value = "";
-    nameInput.disabled = !!forceAutoNmae;
-    btn.textContent= "Upload";
-
+    nameInput.disabled = !!forceAutoName;
+    btn.textContent = "Upload";
   });
-  nameInput.addEventListener('input',() => {
-    if(!window.state.productImages[i]) window.state.productImages[i] = {file:null, name:''}
+
+  // keep name input synced if user types (only if allowed)
+  nameInput.addEventListener('input', () => {
+    if (!window.state.productImages[i]) window.state.productImages[i] = { file: null, name: '' };
     window.state.productImages[i].name = nameInput.value;
   });
 
-  input.addEventListener('change',(e) =>{
+  // When file chosen
+  input.addEventListener('change', (e) => {
     const file = e.target.files[0];
-    if(!file) return;
-  })
-  if(file.size >2 * 1024 * 1024){
-    alert('file size must be less than 2MB');
-    input.value = '';
-    return;
+    if (!file) return;
 
-  }
-  const reader = new FileReader();
-  reader.onload = function(ev){
-    preview.innerHTML = `<img src="${ev.target.result}" class="w-full h-full object-cover rounded-xl alt="Preview" >`;
+    // size constraint example
+    if (file.size > 2 * 1024 * 1024) {
+      alert('File size must be less than 2MB');
+      input.value = '';
+      return;
+    }
 
-  };
-  reader.readAsDataURL(file);
-
-  let base = '';
-  const itemCodeEl = document.querySelector(itemcodeSelector);
-  const itemNameEl = document.querySelector(itemnameSelector);
-  if(itemCodeEl && itemCodeEl.value) base = itemCodeEl.value;
-  else if(itemNameEl && itemCodeEl.value) base = itemCodeEl.value;
-  else{
-    base = 'item';
-  }
-  const slugBase = slugifyForFilename(base);
-
-  
-   const existingNumbers = [];
-  window.state.productImages.forEach((slot,idx) =>{
-    if (!slot || !slot.name)return;
-    const nm = slot.name.toString();
-    const match = nm.match(new RegExp(slugBase + '[-_]?([0-9]{1,})$'));
-    if(match && match[1] existingNumbers.push(parseInt(match[1], 10)));
-
-    // find smallest unused number starting from 1
-    let serial = 1;
-    while (existingNumbers.includes(serial)) serial++;
-
-    // use pad
-    const serialPart = padSerial(serial, padWidth);
-    const generatedName = `${slugBase}${serialPart}`;
-
-    // set name input and state
-    nameInput.disabled = !!forceAutoName; // disable if forced
-    nameInput.value = generatedName;
-    btn.textContent = 'Edit';
-    window.state.productImages[i] = {
-      file: file,
-      name: generatedName,
-      url: null // you can set a server URL after upload
+    // Preview
+    const reader = new FileReader();
+    reader.onload = function(ev) {
+      preview.innerHTML = `<img src="${ev.target.result}" class="w-full h-full object-cover rounded-xl" alt="Preview">`;
     };
+    reader.readAsDataURL(file);
+
+    // Generate name automatically
+    // 1) read item code or name from DOM if available
+    // AUTO NAME LOGIC
+let base = '';
+const itemCodeEl = document.querySelector(itemCodeSelector);
+const itemNameEl = document.querySelector(itemNameSelector);
+
+if (itemCodeEl && itemCodeEl.value) base = itemCodeEl.value;
+else if (itemNameEl && itemNameEl.value) base = itemNameEl.value;
+else base = 'item';
+
+// slug but KEEP original case for display
+const slugBaseRaw = base.trim();
+const slugBase = slugifyForFilename(base);  // lowercase, safe.
+
+// Collect existing serial numbers
+const existingNumbers = [];
+window.state.productImages.forEach((slot) => {
+    if (!slot || !slot.name) return;
+    const name = slot.name.toString();
+
+    // Match patterns:
+    // Testing001
+    // testing001
+    // testing-001
+    // testing_001
+    const regex = new RegExp(`^${slugBase}[-_]?([0-9]+)$`, "i");
+
+    const match = name.match(regex);
+    if (match && match[1]) {
+        existingNumbers.push(parseInt(match[1], 10));
+    }
+});
+
+// Next available number
+let serial = 1;
+while (existingNumbers.includes(serial)) serial++;
+
+const generatedName = `${slugBaseRaw}${padSerial(serial, padWidth)}`;
+
+// Apply to DOM + state
+nameInput.value = generatedName;
+nameInput.disabled = !!forceAutoName;
+
+window.state.productImages[i] = {
+    file: file,
+    name: generatedName,
+    url: null
+};
+btn.textContent = "Edit";
+
   });
 }
+
+
 
 
  function setupSkuModal() {

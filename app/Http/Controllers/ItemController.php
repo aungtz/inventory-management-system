@@ -145,7 +145,7 @@ public function exportAll()
             }
 
             // 4. Build final filename (unique)
-            $filename = time() . '_' . preg_replace('/\s+/', '_', $baseName);
+            $filename =  '_' . preg_replace('/\s+/', '_', $baseName);
 
             // 5. Store file
             $image->storeAs('items', $filename, 'public');

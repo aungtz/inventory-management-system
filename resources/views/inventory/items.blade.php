@@ -81,10 +81,10 @@
       transition: all 0.2s ease-in-out;
     }
 
-    .sku-row:hover {
+    /* .sku-row:hover {
       background-color: rgba(249, 250, 251, 0.8);
       transform: translateX(4px);
-    }
+    } */
 
     .btn-primary {
       background: linear-gradient(135deg, #4f46e5 0%, #7c3aed 100%);
@@ -161,10 +161,38 @@
       -ms-overflow-style: none;
       scrollbar-width: none;
     }
+    .input-error-tooltip {
+    position: absolute;
+    background: #dc2626;
+    color: white;
+    padding: 4px 8px;
+    border-radius: 6px;
+    font-size: 12px;
+    top: -28px;            /* SHOW ABOVE INPUT */
+    left: 0;
+    z-index: 50;
+    animation: fadeIn 0.2s ease-in-out;
+    white-space: nowrap;
+}
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(-3px); }
+    to   { opacity: 1; transform: translateY(0); }
+}
+.input-wrapper {
+    position: relative;   /* IMPORTANT so tooltip positions correctly */
+}
+
+
   </style>
 </head>
+
 <body class="min-h-screen bg-gradient-to-br from-indigo-50 via-white to-cyan-50 text-gray-800">
-  <div class="max-w-6xl mx-auto p-6 animate__animated animate__fadeIn">
+
+  @include('layout.sidebar')
+
+<!-- main contents -->
+<div class="max-w-6xl mx-auto p-6 animate__animated animate__fadeIn">
+  
     <!-- Header with smooth entrance -->
     <div class="flex justify-between items-center mb-8 slide-in-up">
       <div>
@@ -195,36 +223,36 @@
               <!-- Top Row Grid -->
               <div class="grid grid-cols-3 gap-4 mb-4">
                 <!-- Item Code -->
-                <div class="transform transition-all duration-300 hover:scale-[1.02]">
-                  <label class="block font-semibold mb-2 text-gray-700">Item Code <span class="text-red-500">*</span></label>
-                  <input type="text" name="Item_Code" required
-                         class="input-focus w-full p-3 rounded-xl border border-gray-300 focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-all duration-300">
-                   <p class="item-code-error text-red-500 text-sm mt-1 hidden"></p>
-
-                        </div>
+               <div class="transform transition-all duration-300 hover:scale-[1.02]">
+  <label class="block font-semibold mb-2 text-gray-700 text-sm">Item Code <span class="text-red-500">*</span></label>
+  <input type="text" name="Item_Code" required
+         class="input-focus w-full p-3 rounded-xl border border-gray-300 focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-all duration-300 text-sm">
+   <p class="item-code-error text-red-500 text-xs mt-1 hidden"></p>
+</div>
 
                 <!-- JAN Code -->
-                <div class="transform transition-all duration-300 hover:scale-[1.02]">
-                  <label class="block font-semibold mb-2 text-gray-700">JAN Code <span class="text-red-500">*</span></label>
-                  <input type="text" name="JanCD" maxlength="13" required
-                         class="input-focus w-full p-3 rounded-xl border border-gray-300 focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-all duration-300">
-                </div>
+               <div class="transform transition-all duration-300 hover:scale-[1.02]">
+  <label class="block font-semibold mb-2 text-gray-700 text-sm">JAN Code <span class="text-red-500">*</span></label>
+  <input type="text" name="JanCD" maxlength="13" required
+         class="input-focus w-full p-3 rounded-xl border border-gray-300 focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-all duration-300 text-sm">
+</div>
 
-                <!-- Maker Name -->
-                <div class="transform transition-all duration-300 hover:scale-[1.02]">
-                  <label class="block font-semibold mb-2 text-gray-700">Maker Name <span class="text-red-500">*</span></label>
-                  <input type="text" name="MakerName" required
-                         class="input-focus w-full p-3 rounded-xl border border-gray-300 focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-all duration-300">
-                </div>
-              </div>
+      <!-- Maker Name -->
+      <div class="transform transition-all duration-300 hover:scale-[1.02]">
+        <label class="block font-semibold mb-2 text-gray-700 text-sm">Maker Name <span class="text-red-500">*</span></label>
+        <input type="text" name="MakerName" required
+              class="input-focus w-full p-3 rounded-xl border border-gray-300 focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-all duration-300 text-sm">
+      </div>
+      </div>
 
-              <!-- Item Name -->
-              <div class="transform transition-all duration-300 hover:scale-[1.02]">
-                <label class="block font-semibold mb-2 text-gray-700">Item Name <span class="text-red-500">*</span></label>
-                <textarea name="Item_Name" rows="2" required
-                    class="input-focus w-full p-3 rounded-xl border border-gray-300 focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-all duration-300 resize-none"></textarea>
-              </div>
-            </div>
+      <!-- Item Name -->
+      <div class="transform transition-all duration-300 hover:scale-[1.02]">
+        <label class="block font-semibold mb-2 text-gray-700 text-sm">Item Name <span class="text-red-500">*</span></label>
+        <textarea name="Item_Name" rows="2" required
+            class="input-focus w-full p-3 rounded-xl border border-gray-300 focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-all duration-300 resize-none text-sm"></textarea>
+      </div>
+      </div>
+
 
             <!-- Memo Right Column -->
             <div class="flex-1 transform transition-all duration-300 hover:scale-[1.01]">
@@ -244,31 +272,32 @@
 
             <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
               <div class="transform transition-all duration-300 hover:scale-[1.02]">
-                <label class="block font-semibold mb-2 text-gray-700">Basic Price <span class="text-red-500">*</span></label>
-                <div class="flex items-center">
-                  <input type="text" name="BasicPrice" required placeholder="0" 
-                         class="price-input input-focus flex-1 p-3 rounded-xl border border-gray-300 focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-all duration-300" />
-                  <span class="ml-3 text-gray-600 font-medium">円</span>
-                </div>
-              </div>
+        <label class="block font-semibold mb-2 text-gray-700 text-sm">Basic Price <span class="text-red-500">*</span></label>
+        <div class="flex items-center">
+          <input type="text" name="BasicPrice" required placeholder="0" 
+                 class="price-input input-focus flex-1 p-3 rounded-xl border border-gray-300 focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-all duration-300 text-sm" />
+          <span class="ml-3 text-gray-600 font-medium text-sm">円</span>
+        </div>
+      </div>
 
-              <div class="transform transition-all duration-300 hover:scale-[1.02]">
-                <label class="block font-semibold mb-2 text-gray-700">List Price <span class="text-red-500">*</span></label>
-                <div class="flex items-center">
-                  <input type="text" name="ListPrice" required placeholder="0" 
-                         class="price-input input-focus flex-1 p-3 rounded-xl border border-gray-300 focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-all duration-300" />
-                  <span class="ml-3 text-gray-600 font-medium">円</span>
-                </div>
-              </div>
+               <div class="transform transition-all duration-300 hover:scale-[1.02]">
+        <label class="block font-semibold mb-2 text-gray-700 text-sm">List Price <span class="text-red-500">*</span></label>
+        <div class="flex items-center">
+          <input type="text" name="ListPrice" required placeholder="0" 
+                 class="price-input input-focus flex-1 p-3 rounded-xl border border-gray-300 focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-all duration-300 text-sm" />
+          <span class="ml-3 text-gray-600 font-medium text-sm">円</span>
+        </div>
+      </div>
 
-              <div class="transform transition-all duration-300 hover:scale-[1.02]">
-                <label class="block font-semibold mb-2 text-gray-700">Cost Price <span class="text-red-500">*</span></label>
-                <div class="flex items-center">
-                  <input type="text" name="CostPrice" required placeholder="0" 
-                         class="price-input input-focus flex-1 p-3 rounded-xl border border-gray-300 focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-all duration-300" />
-                  <span class="ml-3 text-gray-600 font-medium">円</span>
-                </div>
-              </div>
+
+             <div class="transform transition-all duration-300 hover:scale-[1.02]">
+        <label class="block font-semibold mb-2 text-gray-700 text-sm">Cost Price <span class="text-red-500">*</span></label>
+        <div class="flex items-center">
+          <input type="text" name="CostPrice" required placeholder="0" 
+                 class="price-input input-focus flex-1 p-3 rounded-xl border border-gray-300 focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-all duration-300 text-sm" />
+          <span class="ml-3 text-gray-600 font-medium text-sm">円</span>
+        </div>
+      </div>
             </div>
           </div>
         </div>
@@ -397,7 +426,7 @@
 
   <!-- Enhanced SKU Modal -->
   <div id="skuModal" class="modal-overlay fixed inset-0 z-50 items-start justify-center pt-20 bg-black/40 backdrop-blur">
-    <div class="modal-content bg-white rounded-3xl shadow-2xl p-8 border border-gray-200/80 mx-4 max-h-[85vh] overflow-hidden flex flex-col">
+    <div class="modal-content bg-white rounded-3xl shadow-2xl p-8 border border-gray-200/80 mx-4 max-h-[85vh] overflow-hidden flex flex-col max-w-7xl">
       <!-- Modal Header -->
       <div class="flex justify-between items-center mb-8 pb-4 border-b border-gray-200">
         <div>
@@ -484,66 +513,168 @@
   });
 
 
-function setupImageSlot(i) {
-    const input = document.getElementById(`imageInput${i}`);
-    const preview = document.getElementById(`imagePreview${i}`);
-    const nameInput = document.getElementById(`imageName${i}`);
-    const btn = document.getElementById(`imageBtn${i}`);
-    const removeBtn = document.getElementById(`imageRemove${i}`);
+// function setupImageSlot(i) {
+//     const input = document.getElementById(`imageInput${i}`);
+//     const preview = document.getElementById(`imagePreview${i}`);
+//     const nameInput = document.getElementById(`imageName${i}`);
+//     const btn = document.getElementById(`imageBtn${i}`);
+//     const removeBtn = document.getElementById(`imageRemove${i}`);
 
-    btn.addEventListener('click', () => input.click());
+//     btn.addEventListener('click', () => input.click());
 
-    removeBtn.addEventListener('click', () => {
-      input.value = "";               // reset file input
-      state.productImages[i] = null;  // clear state
-      preview.innerHTML = '<div class="text-center">No Image</div>';
-      nameInput.value = "";
-      nameInput.disabled = true;
-      btn.textContent = "Upload";
+//     removeBtn.addEventListener('click', () => {
+//       input.value = "";               // reset file input
+//       state.productImages[i] = null;  // clear state
+//       preview.innerHTML = '<div class="text-center">No Image</div>';
+//       nameInput.value = "";
+//       nameInput.disabled = true;
+//       btn.textContent = "Upload";
 
-        state.productImages[i] = null;
-        preview.innerHTML = '<div class="text-center">No Image</div>';
-        nameInput.value = '';
-        nameInput.disabled = true;
-        btn.textContent = 'Upload';
+//         state.productImages[i] = null;
+//         preview.innerHTML = '<div class="text-center">No Image</div>';
+//         nameInput.value = '';
+//         nameInput.disabled = true;
+//         btn.textContent = 'Upload';
         
-    });
+//     });
 
-    nameInput.addEventListener('input', () => {
-        if (!state.productImages[i]) state.productImages[i] = { file: null, name: '' };
-        state.productImages[i].name = nameInput.value;
-    });
+//     nameInput.addEventListener('input', () => {
+//         if (!state.productImages[i]) state.productImages[i] = { file: null, name: '' };
+//         state.productImages[i].name = nameInput.value;
+//     });
 
-    input.addEventListener('change', (e) => {
-        const file = e.target.files[0];
-        if (!file) return;
+//     input.addEventListener('change', (e) => {
+//         const file = e.target.files[0];
+//         if (!file) return;
 
-        if (file.size > 2 * 1024 * 1024) { // max 2MB
-            alert('File size must be less than 2MB');
-            input.value = '';
-            return;
-        }
+//         if (file.size > 2 * 1024 * 1024) { // max 2MB
+//             alert('File size must be less than 2MB');
+//             input.value = '';
+//             return;
+//         }
 
-        const reader = new FileReader();
-        reader.onload = function(ev) {
-            preview.innerHTML = `<img src="${ev.target.result}" class="w-full h-full object-cover rounded-xl" alt="Preview">`;
-        };
-        reader.readAsDataURL(file);
+//         const reader = new FileReader();
+//         reader.onload = function(ev) {
+//             preview.innerHTML = `<img src="${ev.target.result}" class="w-full h-full object-cover rounded-xl" alt="Preview">`;
+//         };
+//         reader.readAsDataURL(file);
 
-        nameInput.disabled = false;
-        if (!nameInput.value) nameInput.value = file.name;
+//         nameInput.disabled = false;
+//         if (!nameInput.value) nameInput.value = file.name;
 
-        btn.textContent = 'Edit';
-        state.productImages[i] = {
-            file: file,
-            name: nameInput.value || file.name,
-            url: null
-        };
-    });
+//         btn.textContent = 'Edit';
+//         state.productImages[i] = {
+//             file: file,
+//             name: nameInput.value || file.name,
+//             url: null
+//         };
+//     });
+// }
+
+
+
+  window.state  = window.state || {};
+  window.state.productImages = window.state.productImages || [];
+
+  function padSerial(n, width = 3){
+    return String(n).padStart(width,'0');
+  }
+  function slugifyForFilename(text){
+    if(!text) return 'image';
+    return String(text)
+    .trim()
+    .replace(/\s+/g, '-')
+     .replace(/[^a-zA-Z0-9\-_]/g, '')// remove odd chars  }
+     .toLowerCause();
+  }
+
+ function setupImageSlot(i, option = {}){
+   const input = document.getElementById(`imageInput${i}`);
+  const preview = document.getElementById(`imagePreview${i}`);
+  const nameInput = document.getElementById(`imageName${i}`);
+  const btn = document.getElementById(`imageBtn${i}`);
+  const removeBtn = document.getElementById(`imageRemove${i}`);
+
+  const itemCodeSelector = options.itemCodeSelector || '#Item_Code';
+  const itemNameSelector = options.itemNameSelector || '#Item_Name';
+  const padWidth = options.padWidth || 3;
+  const forceAutoName = options.forceAutoName ?? false;
+
+  if(!window.state.productImages[i] ) window.state.productImages[i] = null;
+
+  btn.addEventListener('click',() => input.click());
+
+  removeBtn.addEventLisener('click', () => {
+    input.value = "";
+    window.state.productImages[i] = null ; 
+    preview.innerHTML = '<div class = "text-center"> No Image </div>';
+    nameInput.value = "";
+    nameInput.disabled = !!forceAutoNmae;
+    btn.textContent= "Upload";
+
+  });
+  nameInput.addEventListener('input',() => {
+    if(!window.state.productImages[i]) window.state.productImages[i] = {file:null, name:''}
+    window.state.productImages[i].name = nameInput.value;
+  });
+
+  input.addEventListener('change',(e) =>{
+    const file = e.target.files[0];
+    if(!file) return;
+  })
+  if(file.size >2 * 1024 * 1024){
+    alert('file size must be less than 2MB');
+    input.value = '';
+    return;
+
+  }
+  const reader = new FileReader();
+  reader.onload = function(ev){
+    preview.innerHTML = `<img src="${ev.target.result}" class="w-full h-full object-cover rounded-xl alt="Preview" >`;
+
+  };
+  reader.readAsDataURL(file);
+
+  let base = '';
+  const itemCodeEl = document.querySelector(itemcodeSelector);
+  const itemNameEl = document.querySelector(itemnameSelector);
+  if(itemCodeEl && itemCodeEl.value) base = itemCodeEl.value;
+  else if(itemNameEl && itemCodeEl.value) base = itemCodeEl.value;
+  else{
+    base = 'item';
+  }
+  const slugBase = slugifyForFilename(base);
+
+  
+   const existingNumbers = [];
+  window.state.productImages.forEach((slot,idx) =>{
+    if (!slot || !slot.name)return;
+    const nm = slot.name.toString();
+    const match = nm.match(new RegExp(slugBase + '[-_]?([0-9]{1,})$'));
+    if(match && match[1] existingNumbers.push(parseInt(match[1], 10)));
+
+    // find smallest unused number starting from 1
+    let serial = 1;
+    while (existingNumbers.includes(serial)) serial++;
+
+    // use pad
+    const serialPart = padSerial(serial, padWidth);
+    const generatedName = `${slugBase}${serialPart}`;
+
+    // set name input and state
+    nameInput.disabled = !!forceAutoName; // disable if forced
+    nameInput.value = generatedName;
+    btn.textContent = 'Edit';
+    window.state.productImages[i] = {
+      file: file,
+      name: generatedName,
+      url: null // you can set a server URL after upload
+    };
+  });
 }
 
 
-  function setupSkuModal() {
+ function setupSkuModal() {
     const skuModal = document.getElementById('skuModal');
     const openSku = document.getElementById('openSkuModal');
     const closeSku = document.getElementById('closeSkuModal');
@@ -553,64 +684,84 @@ function setupImageSlot(i) {
     const skuModalBody = document.getElementById('skuModalBody');
 
     openSku.addEventListener('click', () => {
-      populateModalWithExistingSkus();
-      skuModal.classList.add('active');
+        populateModalWithExistingSkus();
+        skuModal.classList.add('active');
     });
 
     closeSku.addEventListener('click', () => skuModal.classList.remove('active'));
     closeModalBtn.addEventListener('click', () => skuModal.classList.remove('active'));
     addSkuRowBtn.addEventListener('click', () => addSkuRow());
 
-  saveSkusBtn.addEventListener('click', () => {
-  const newSkus = [];
-  let duplicateFound = false;
+    // SAVE BUTTON
+    saveSkusBtn.addEventListener('click', () => {
 
-  skuModalBody.querySelectorAll('tr').forEach(row => {
-    const sizeName = row.querySelector('.size-name')?.value.trim() || '';
-    const colorName = row.querySelector('.color-name')?.value.trim() || '';
-    const sizeCode = row.querySelector('.size-code')?.value.trim() || '';
-    const colorCode = row.querySelector('.color-code')?.value.trim() || '';
-    const janCode = row.querySelector('.jan-code')?.value.trim() || '';
-    const qtyFlag = row.querySelector('.qty-flag')?.value || 'false';
-    const stockQuantity = row.querySelector('.stock-quantity')?.value || '0';
+        const newSkus = [];
+        let duplicateFound = false;
+        let janError = false;
 
-    // Skip empty rows
-    if (!sizeName && !colorName && !sizeCode && !colorCode && !janCode) return;
+        skuModalBody.querySelectorAll('tr').forEach(row => {
 
-    // Build a unique key for validation
-const keyName = `${sizeName}__${colorName}`;
-    const keyCode = `${sizeCode}__${colorCode}`;
+            const sizeName = row.querySelector('.size-name')?.value.trim() || '';
+            const colorName = row.querySelector('.color-name')?.value.trim() || '';
+            const sizeCode = row.querySelector('.size-code')?.value.trim() || '';
+            const colorCode = row.querySelector('.color-code')?.value.trim() || '';
+            const janCodeInput = row.querySelector('.jan-code');
+            const janCode = janCodeInput?.value.trim() || '';
+            const qtyFlag = row.querySelector('.qty-flag')?.value || 'false';
+            const stockQuantity = row.querySelector('.stock-quantity')?.value || '0';
 
-    // Check for duplicates in current collection
-    if (newSkus.some(s => s.keyName === keyName || s.keyCode === keyCode)) {
-        duplicateFound = true;
-    } else {
-        newSkus.push({
-            keyName,
-            keyCode,
-            sizeName,
-            colorName,
-            sizeCode,
-            colorCode,
-            janCode,
-            qtyFlag,
-            stockQuantity: parseInt(stockQuantity) || 0
+            // Skip empty entire row
+            if (!sizeName && !colorName && !sizeCode && !colorCode && !janCode) return;
+
+            // ❗ VALIDATE JAN HERE
+            if (!validateSkuJan(janCodeInput)) {
+                janError = true;
+            }
+
+            // Build keys
+            const keyName = `${sizeName}__${colorName}`;
+            const keyCode = `${sizeCode}__${colorCode}`;
+
+            // Check duplicates
+            if (newSkus.some(s => s.keyName === keyName || s.keyCode === keyCode)) {
+                duplicateFound = true;
+            } else {
+                newSkus.push({
+                    keyName,
+                    keyCode,
+                    sizeName,
+                    colorName,
+                    sizeCode,
+                    colorCode,
+                    janCode,
+                    qtyFlag,
+                    stockQuantity: parseInt(stockQuantity) || 0
+                });
+            }
+
         });
-    }
-});
 
-if (duplicateFound) {
-    alert("Duplicate SKUs found! Size+Color or Code+Code must be unique.");
-    return;
+        // ❌ Stop saving if JAN invalid
+        if (janError) {
+            alert("Fix JAN Code before saving.");
+            return;
+        }
+
+        // ❌ Stop saving if duplicates found
+        if (duplicateFound) {
+            alert("Duplicate SKUs found! Size+Color or Code+Code must be unique.");
+            return;
+        }
+
+        // SAVE CLEAN SKUS
+        state.skus = newSkus.map(({ _key, ...sku }) => sku);
+        document.getElementById('skus_json').value = JSON.stringify(state.skus);
+
+        renderSkuTable();
+        skuModal.classList.remove('active');
+    });
 }
 
-  // Save cleaned SKUs to state
-  state.skus = newSkus.map(({ _key, ...sku }) => sku);
-  document.getElementById('skus_json').value = JSON.stringify(state.skus);
-
-  renderSkuTable();
-  skuModal.classList.remove('active');
-});
 
 
   function populateModalWithExistingSkus() {
@@ -667,46 +818,46 @@ document.querySelectorAll('.price-input').forEach(input => {
     const rowId = Date.now() + Math.random();
     
     const row = document.createElement('tr');
-    row.className = 'sku-row border-b border-gray-200 hover:bg-gray-50/50 transition-all duration-200';
-    row.innerHTML = `
-      <td class="p-3 border-r">
-        <button type="button" class="delete-row-btn text-red-500 hover:text-red-700 transition-colors p-1 rounded hover:bg-red-50" data-row-id="${rowId}">
-          <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path>
-          </svg>
-        </button>
-      </td>
-      <td class="p-3 border-r">
-        <input type="text" class="size-name w-full p-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-all duration-200" 
-               value="${skuData.sizeName || ''}" placeholder="Enter size name">
-      </td>
-      <td class="p-3 border-r">
-        <input type="text" class="color-name w-full p-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-all duration-200" 
-               value="${skuData.colorName || ''}" placeholder="Enter color name">
-      </td>
-      <td class="p-3 border-r">
-        <input type="text" class="size-code w-full p-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-all duration-200" 
-               value="${skuData.sizeCode || ''}" placeholder="Size code">
-      </td>
-      <td class="p-3 border-r">
-        <input type="text" class="color-code w-full p-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-all duration-200" 
-               value="${skuData.colorCode || ''}" placeholder="Color code">
-      </td>
-      <td class="p-3 border-r">
-        <input type="text" class="jan-code w-full p-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-all duration-200" 
-               value="${skuData.janCode || ''}" placeholder="JAN code">
-      </td>
-      <td class="p-3 border-r">
-        <select class="qty-flag **w-full** p-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-all duration-200">
-        <option value="true" ${skuData.qtyFlag === 'true' ? 'selected' : ''}>Yes</option>
-        <option value="false" ${skuData.qtyFlag === 'false' || !skuData.qtyFlag ? 'selected' : ''}>No</option>
+  row.className = 'sku-row border-b border-gray-200';
+row.innerHTML = `
+  <td class="p-3 border-r">
+    <button type="button" class="delete-row-btn text-red-500 p-1 rounded transition-none" data-row-id="${rowId}">
+      <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path>
+      </svg>
+    </button>
+  </td>
+  <td class="p-3 border-r">
+    <input type="text" class="size-name w-full p-2 border border-gray-300 rounded-lg transition-none" 
+           value="${skuData.sizeName || ''}" placeholder="Enter size name">
+  </td>
+  <td class="p-3 border-r">
+    <input type="text" class="color-name w-full p-2 border border-gray-300 rounded-lg transition-none" 
+           value="${skuData.colorName || ''}" placeholder="Enter color name">
+  </td>
+  <td class="p-3 border-r">
+    <input type="text" class="size-code w-full p-2 border border-gray-300 rounded-lg transition-none" 
+           value="${skuData.sizeCode || ''}" placeholder="Size code">
+  </td>
+  <td class="p-3 border-r">
+    <input type="text" class="color-code w-full p-2 border border-gray-300 rounded-lg transition-none" 
+           value="${skuData.colorCode || ''}" placeholder="Color code">
+  </td>
+  <td class="p-3 border-r">
+    <input type="text" class="jan-code w-full p-2 border border-gray-300 rounded-lg transition-none" 
+           value="${skuData.janCode || ''}" placeholder="JAN code">
+  </td>
+  <td class="p-3 border-r">
+    <select class="qty-flag w-full p-2 border border-gray-300 rounded-lg transition-none">
+      <option value="true" ${skuData.qtyFlag === 'true' ? 'selected' : ''}>Yes</option>
+      <option value="false" ${skuData.qtyFlag === 'false' || !skuData.qtyFlag ? 'selected' : ''}>No</option>
     </select>
-      </td>
-      <td class="p-3">
-        <input type="number" class="stock-quantity text-right w-full p-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-all duration-200" 
-               value="${skuData.stockQuantity || '0'}" placeholder="0" min="0">
-      </td>
-    `;
+  </td>
+  <td class="p-3">
+    <input type="number" class="stock-quantity text-right w-full p-2 border border-gray-300 rounded-lg transition-none" 
+           value="${skuData.stockQuantity || '0'}" placeholder="0" min="0">
+  </td>
+`;
 
     skuModalBody.appendChild(row);
     row.querySelector('.delete-row-btn').addEventListener('click', (e) => {
@@ -750,7 +901,7 @@ document.querySelectorAll('.price-input').forEach(input => {
       if (emptyState) emptyState.style.display = 'none';
       state.skus.forEach((sku, index) => {
         const row = document.createElement('tr');
-        row.className = 'border-b border-gray-200 hover:bg-gray-50/50 transition-all duration-200';
+        row.className = 'border-b border-gray-200 transition-all duration-200';
         row.innerHTML = `
           <td class="p-4 border-r">${escapeHtml(sku.colorName || '-')}</td>
           <td class="p-4 border-r">${escapeHtml(sku.sizeName || '-')}</td>
@@ -768,7 +919,7 @@ document.querySelectorAll('.price-input').forEach(input => {
       return entityMap[s];
     });
   }
-}
+
 document.getElementById('itemForm').addEventListener('submit', async function(e) {
     e.preventDefault(); // stop normal submit
 

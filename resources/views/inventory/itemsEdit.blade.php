@@ -161,11 +161,32 @@
       -ms-overflow-style: none;
       scrollbar-width: none;
     }
+     .input-error-tooltip {
+    position: absolute;
+    background: #dc2626;
+    color: white;
+    padding: 4px 8px;
+    border-radius: 6px;
+    font-size: 12px;
+    top: -28px;            /* SHOW ABOVE INPUT */
+    left: 0;
+    z-index: 50;
+    animation: fadeIn 0.2s ease-in-out;
+    white-space: nowrap;
+}
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(-3px); }
+    to   { opacity: 1; transform: translateY(0); }
+}
+.input-wrapper {
+    position: relative;   /* IMPORTANT so tooltip positions correctly */
+}
+
   </style>
 </head>
 
 <body class="min-h-screen bg-gradient-to-br from-indigo-50 via-white to-cyan-50 text-gray-800">
- 
+ @include('layout.sidebar')
  
 <div class="max-w-6xl mx-auto p-6 animate__animated animate__fadeIn">
   
@@ -188,8 +209,11 @@
 
     <!-- Main Form Container -->
     <div class="bg-white/80 backdrop-blur rounded-2xl shadow-xl p-8 transition-all duration-500 border border-gray-200/80 card-hover">
-<form id="itemForm" action="#"
-      method="POST" enctype="multipart/form-data" class="space-y-8">
+      <form id="itemForm" 
+        action="{{ route('items.update', $item->Item_Code) }}"
+            method="POST" 
+            enctype="multipart/form-data" 
+      class="space-y-8">
     @csrf
     @method('PUT')        @csrf
 
@@ -203,10 +227,10 @@
                 <!-- Item Code -->
                 <div class="transform transition-all duration-300 hover:scale-[1.02]">
                   <label class="block font-semibold mb-2 text-gray-700">Item Code <span class="text-red-500">*</span></label>
-                  <input type="text" name="Item_Code" required   id="Item_Code"    value="{{ $item->Item_Code }}" readonly disabled
+                  <input type="text" name="Item_Code" required   id="Item_Code"    value="{{ $item->Item_Code }}" readonly 
 
                          class="input-focus w-full p-3 rounded-xl border border-gray-300 focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-all duration-300">
-                   <p class="item-code-error text-red-500 text-sm mt-1 hidden"></p>
+                   <!-- <p class="item-code-error text-red-500 text-sm mt-1 hidden"></p> -->
 
                         </div>
 
@@ -234,7 +258,6 @@
                     {{ $item->Item_Name }}</textarea>
               </div>
             </div>
-
             <!-- Memo Right Column -->
             <div class="flex-1 transform transition-all duration-300 hover:scale-[1.01]">
               <label class="block font-semibold mb-2 text-gray-700">Memo</label>
@@ -401,6 +424,9 @@
 
         <!-- Hidden SKU Data -->
         <input type="hidden" name="skus_json" id="skus_json" >
+        <input type="hidden" name="image_existing[{{ $i }}]" id="imageExisting{{ $i }}">
+        <input type="hidden" name="image_delete[{{ $i }}]" id="imageDelete{{ $i }}">
+        <input type="hidden" name="image_newname[{{ $i }}]" id="imageNewName{{ $i }}">
 
         <!-- Submit Buttons -->
         <div class="flex justify-end mt-8 space-x-4 pt-6 border-t border-gray-200 slide-in-up">
@@ -413,9 +439,14 @@
             <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
             </svg>
-            Save Item
+            Update Item
           </button>
         </div>
+        @for($i = 0; $i < 5; $i++)
+    <input type="hidden" name="imageNames[]" id="hiddenImageName{{ $i }}">
+    <input type="hidden" name="imageStates[]" id="hiddenImageState{{ $i }}">
+@endfor
+
       </form>
     </div>
   </div>
@@ -498,8 +529,7 @@ $existingImages = $item->images->map(function($img) {
 });
 @endphp
 <!-- <script src="{{ asset('js/validation/item-validation.js') }}"></script> -->
-      <script src="{{ asset('js/validation/item-validation.js') }}?v={{ time() }}"></script>
-
+      <script src="{{ asset('js/validation/item-validation.js') }}"></script>
 <script>
       const existingSkus = @json($item->skus);
       const existingImages = @json($existingImages);
@@ -512,9 +542,7 @@ $existingImages = $item->images->map(function($img) {
   };
 
   document.addEventListener('DOMContentLoaded', () => {
-    for (let i = 0; i < 5; i++) {
-      setupImageSlot(i);
-    }
+    
     setupSkuModal();
   });
 
@@ -745,6 +773,26 @@ document.querySelectorAll('.price-input').forEach(input => {
     priceFields.forEach(f => {
         f.value = unformatPrice(f.value); 
     });
+
+    for (let i = 0; i < 5; i++) {
+    let img = state.productImages[i];
+    let nameInput = document.getElementById(`hiddenImageName${i}`);
+    let stateInput = document.getElementById(`hiddenImageState${i}`);
+
+    if (!img) {
+        nameInput.value = "";
+        stateInput.value = "delete"; // means backend should delete this slot
+    }
+    else if (img.file) {
+        nameInput.value = img.name;  
+        stateInput.value = "new"; // backend should create/update with file
+    }
+    else if (img.url) {
+        nameInput.value = img.name;
+        stateInput.value = "existing"; // keep old image
+    }
+}
+
 });
 
  function addSkuRow(skuData = {}) {
@@ -788,7 +836,6 @@ document.querySelectorAll('.price-input').forEach(input => {
     // delete button
     row.querySelector('.delete-row-btn').addEventListener('click', () => row.remove());
 }
-
 document.querySelectorAll('.image-name').forEach(input => {
     input.addEventListener('blur', () => {
         let name = input.value.trim();
@@ -871,23 +918,19 @@ function loadExistingSkusIntoModal() {
     });
   }
 
-document.getElementById('itemForm').addEventListener('submit', async function(e) {
-    e.preventDefault(); // stop normal submit
+// document.getElementById('itemForm').addEventListener('submit', async function(e) {
+//     e.preventDefault(); // stop normal submit
 
-    const itemCode = document.querySelector('input[name="Item_Code"]').value.trim();
+//     const itemCode = document.querySelector('input[name="Item_Code"]').value.trim();
 
-    // Check duplicate item code first
-    const response = await fetch(`/check-item-code?code=${itemCode}`);
-    const data = await response.json();
+//     // Check duplicate item code first
+//     const response = await fetch(`/check-item-code?code=${itemCode}`);
+//     const data = await response.json();
 
-    if (data.exists) {
-        alert("❌ Item Code already exists. Please use another one.");
-        return;
-    }
 
-    // No duplicate → submit form normally
-    this.submit();
-});
+//     // No duplicate → submit form normally
+//     this.submit();
+// });
 
 </script>
 </body>

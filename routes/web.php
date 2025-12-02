@@ -9,6 +9,7 @@ use App\Exports\StocksExport;
 use App\Http\Controllers\CategoryController;
 use App\Http\Controllers\SalesController;
 use App\Http\Controllers\ItemController;
+use App\Http\Controllers\ImportLogController;
 
 use Maatwebsite\Excel\Facades\Excel;
 use App\Imports\StocksImport;
@@ -51,22 +52,6 @@ Route::get('/inventory/export-excel', function () {
     return Excel::download(new StocksExport, 'stocks.xlsx');
 })->name('inventory.exportExcel');
 
-Route::post('/inventory/import-excel', function (Request $request) {
-    $request->validate([
-        'file' => 'required|mimes:xlsx,csv'
-    ]);
-
-    try {
-        Excel::import(new StocksImport, $request->file('file'));
-
-        // Success message
-        return redirect()->back()->with('success', 'Stocks imported successfully!');
-    } catch (\Exception $e) {
-        // Error message
-        return redirect()->back()->with('error', 'Import failed: ' . $e->getMessage());
-    }
-})->name('inventory.importExcel');
-
 
 Route::get('/inventory/export-pdf', [StockControlController::class, 'exportPDF'])->name('inventory.exportPDF');
 Route::get('/inventory/export-csv', [StockControlController::class, 'exportCSV'])->name('inventory.exportCSV');
@@ -103,3 +88,10 @@ Route::get('/check-itemcode', function (\Illuminate\Http\Request $request) {
 Route::get('/export-items', [ItemController::class, 'exportItems'])->name('export.items');
 Route::get('/export-skus', [ItemController::class, 'exportSkus'])->name('export.skus');
 Route::get('/export-all', [ItemController::class, 'exportAll'])->name('export.all');
+
+// Import Session
+
+Route::get('/import-log', [ImportLogController::class, 'index'])->name('import-log.index');
+Route::get('/sku-master/import', [ImportLogController::class, 'importSkuPage'])->name('sku-master.import');
+Route::get('/item-master/import',[ImportLogController::class,'importItemPage'])->name('item-master.import');
+

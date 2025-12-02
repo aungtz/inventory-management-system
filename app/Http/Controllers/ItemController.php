@@ -168,41 +168,95 @@ public function exportAll()
 public function edit($id)
 {
     $item = Item::with(['skus', 'images'])->findOrFail($id);
-
         return view('inventory.itemsEdit', compact('item'));
 
 }
+public function update(Request $request, $id)
+{
+    // Log request for debugging
+    \Log::info('📦 Update Request Data: ' . json_encode($request->all()));
 
+    $item = Item::findOrFail($id);
 
-    // Update existing item
-    public function update(Request $request, $id)
-    {
-        $item = Item::findOrFail($id);
+    // Validate item data
+    $validated = $request->validate([
+        'Item_Code' => 'required|string|max:255',
+        'Item_Name' => 'required|string|max:255',
+        'JanCD' => 'required|string|max:13',
+        'MakerName' => 'required|string|max:255',
+        'BasicPrice' => 'required|numeric',
+        'ListPrice' => 'required|numeric',
+        'CostPrice' => 'required|numeric',
+        'Memo' => 'nullable|string',
+        'images.*' => 'image|mimes:jpeg,png,jpg,gif,svg|max:2048'
+    ]);
 
-        $validated = $request->validate([
-            'Item_Code' => 'required|string|max:255',
-            'Item_Name' => 'required|string|max:255',
-            'JanCD' => 'required|string|max:13',
-            'MakerName' => 'required|string|max:255',
-            'BasicPrice' => 'required|numeric',
-            'ListPrice' => 'required|numeric',
-            'CostPrice' => 'required|numeric',
-            'Memo' => 'nullable|string',
-            'images.*' => 'image|mimes:jpeg,png,jpg,gif,svg|max:2048'
-        ]);
+    // Update item fields
+    $item->update($validated);
 
-        $item->update($validated);
+    $imageStates = $request->input('imageStates', []);
+    $imageNames  = $request->input('imageNames', []);
+    $uploadedImages = $request->file('images', []);
 
-        // Handle new images
-        if ($request->hasFile('images')) {
-            foreach ($request->file('images') as $image) {
-                $path = $image->store('items', 'public');
-                $item->images()->create(['path' => $path]);
+    foreach ($imageStates as $slot => $state) {
+        $imageName = $imageNames[$slot] ?? null;
+
+        if ($state === 'delete') {
+            // Delete image from DB
+            ItemImage::where('Item_Code', $item->Item_Code)
+                ->where('slot', $slot)
+                ->delete();
+        } elseif ($state === 'new') {
+            if (isset($uploadedImages[$slot])) {
+                $file = $uploadedImages[$slot];
+                $originalName = $file->getClientOriginalName();
+                $path = $file->storeAs('items', $originalName, 'public');
+
+                // Find next available slot dynamically
+                $nextSlot = ItemImage::where('Item_Code', $item->Item_Code)
+                                ->max('slot');
+                $nextSlot = is_null($nextSlot) ? 0 : $nextSlot + 1;
+
+                ItemImage::create([
+                    'Item_Code' => $item->Item_Code,
+                    'slot' => $nextSlot,
+                    'Image_Name' => $imageName ?? $file->getClientOriginalName(),
+                    'path' => $path
+                ]);
+            }
+        } elseif ($state === 'existing') {
+            // Update image name if changed
+            if ($imageName) {
+                ItemImage::where('Item_Code', $item->Item_Code)
+                    ->where('slot', $slot)
+                    ->update(['Image_Name' => $imageName]);
             }
         }
-
-        return redirect()->route('items.index')->with('success', 'Item updated successfully');
     }
+
+    // Handle SKUs
+    $skus = json_decode($request->input('skus_json', '[]'), true);
+    if ($skus) {
+        // Delete old SKUs first
+        $item->skus()->delete();
+
+        foreach ($skus as $sku) {
+            $item->skus()->create([
+                'Size_Name'  => $sku['sizeName'] ?? null,
+                'Color_Name' => $sku['colorName'] ?? null,
+                'Size_Code'  => $sku['sizeCode'] ?? null,
+                'Color_Code' => $sku['colorCode'] ?? null,
+                'JanCode'    => $sku['janCode'] ?? null,
+                'Quantity'   => $sku['stockQuantity'] ?? 0
+            ]);
+        }
+    }
+
+    return redirect()->route('items.index')->with('success', 'Item updated successfully');
+}
+
+
+
 
   public function destroy($Item_Code)
 {

@@ -19,6 +19,32 @@ function showAlert(message) {
     }, 1500);
 }
 
+function showInputError(input, message) {
+    // remove old tooltip if exists
+    let old = input.parentNode.querySelector(".input-error-tooltip");
+    if (old) old.remove();
+
+    // create tooltip
+    let tip = document.createElement("div");
+    tip.className = "input-error-tooltip";
+    tip.textContent = message;
+
+    // ensure parent is position:relative
+    input.parentNode.style.position = "relative";
+
+    // insert after input
+    input.parentNode.appendChild(tip);
+
+    // auto remove
+    setTimeout(() => {
+        tip.remove();
+    }, 1500);
+}
+function removeInputTooltip(input) {
+    const old = input.parentNode.querySelector(".input-error-tooltip");
+    if (old) old.remove();
+}
+
 
 function setValid(input) {
     input.classList.remove('border-red-500');
@@ -35,14 +61,14 @@ function validateRequiredText(input, maxLength = 100) {
 
     if (!val) {
         setInvalid(input);
-        showAlert("This field is required");
+        showInputError(input,"This field is required");
         return false;
     }
 
     if (val.length > maxLength) {
         input.value = val.substring(0, maxLength);
         setInvalid(input);
-        showAlert(`Max ${maxLength} characters allowed`);
+        showInputError(input,`Max ${maxLength} characters allowed`);
         return false;
     }
 
@@ -50,24 +76,52 @@ function validateRequiredText(input, maxLength = 100) {
     return true;
 }
 
-
 function validateItemCode(input) {
     let cleaned = input.value.replace(/\s+/g, '');
 
+    // Remove spaces
     if (cleaned !== input.value) {
         input.value = cleaned;
         setInvalid(input);
-        showAlert("Spaces are not allowed in Item Code");
+        showInputError(input, "Spaces are not allowed in Item Code");
         return false;
     }
 
+    // ❌ Detect Japanese text (Hiragana, Katakana, Kanji, fullwidth symbols)
+    const jpRegex = /[\u3000-\u30FF\u4E00-\u9FFF\uFF00-\uFFEF]/;
+
+    if (jpRegex.test(cleaned)) {
+        setInvalid(input);
+        showInputError(input, "Japanese characters are not allowed");
+        return false;
+    }
+
+    // ❌ Empty check
     if (cleaned.length === 0) {
         setInvalid(input);
-        showAlert("Item Code is required");
+        showInputError(input, "Item Code is required");
         return false;
     }
 
+    // ✔ Valid
     setValid(input);
+    return true;
+}
+
+function blockJapaneseInput(event) {
+    // Allow navigation and control keys
+    if (event.ctrlKey || event.altKey || event.metaKey) return true;
+    
+    // Allow function keys, navigation, etc.
+    if (event.key.length > 1) return true;
+    
+    // Block if the key is a Japanese character
+    const jpRegex = /[\u3000-\u30FF\u4E00-\u9FFF\uFF00-\uFFEF]/;
+    if (jpRegex.test(event.key)) {
+        event.preventDefault();
+        return false;
+    }
+    
     return true;
 }
 function validateMemo(input) {
@@ -76,49 +130,100 @@ function validateMemo(input) {
 
     if (val.length === 0) {
         setInvalid(input);
-        showAlert("Memo cannot be empty");
+        showInputError(input,"Memo cannot be empty");
         return false;
     }
 
     if (val.length > 200) {
         input.value = val.substring(0, 200);
         setInvalid(input);
-        showAlert("Memo cannot exceed 200 characters");
+        showInputError(input,"Memo cannot exceed 200 characters");
         return false;
     }
 
     setValid(input);
     return true;
 }
+function validateJanGeneric(input, { enforceExact13 = false } = {}) {
+  if (!input) return { ok: false, reason: 'missing input' };
 
-function validateJanCode(input) {
-    let val = input.value.replace(/\D/g, '');
+  // sanitize digits only
+  let raw = input.value.replace(/\D/g, '');
 
-    // ❗ If first digit is 0 — block it
-    if (val.startsWith('0')) {
-        showAlert("JAN cannot start with 0");
-        val = val.substring(1); // remove the zero
-    }
+  // If first char is '0' => show message and refuse to accept that zero.
+  if (raw.startsWith('0')) {
+    // remove the leading zero(s). Show message and stop validation here.
+    raw = raw.replace(/^0+/, ''); // remove all leading zeros safely
+    input.value = raw;
+    setInvalid(input);
+    showInputError(input, 'JAN cannot start with 0');
+    return { ok: false, reason: 'starts-with-0' };
+  }
 
-    input.value = val;
+  // Trim to maximum 13 digits (prevents typing beyond)
+  if (raw.length > 13) {
+    raw = raw.slice(0, 13);
+    input.value = raw;
+    setInvalid(input);
+    showInputError(input, 'JAN cannot exceed 13 digits');
+    return { ok: false, reason: 'too-long' };
+  }
 
-    // Empty
-    if (val.length === 0) {
+  input.value = raw; // keep input synced
+
+   if (raw.length === 0) {
         setInvalid(input);
-                showAlert("JAN cannot be empty");
-
+        showInputError(input,"SKU JanCd is  cannot be empty. ")
         return false;
     }
-
-    // Must be 13 digits
-    if (val.length !== 13) {
-        setInvalid(input);
-        showAlert("JAN must be 13 digits");
-        return false;
+  // Empty check
+  if (raw.length === 0) {
+    setInvalid(input);
+    if (enforceExact13) {
+      showInputError(input, 'JAN cannot be empty');
     }
 
+
+   
+    return { ok: false, reason: 'empty' };
+  }
+
+  // If we require exact 13 (for save) but not yet 13, show message
+  if (enforceExact13 && raw.length !== 13) {
+    setInvalid(input);
+    showInputError(input, 'JAN must be exactly 13 digits');
+    return { ok: false, reason: 'not-13' };
+  }
+
+  // Not enforcing exact13 (live typing): if <13 then accept as "incomplete" but mark invalid
+  if (!enforceExact13) {
+    if (raw.length < 13) {
+      setInvalid(input);
+      // show a light temporary tooltip (don't spam). optional:
+      showInputError(input, `JAN incomplete (${raw.length}/13)`, { autoHide: 900 });
+      return { ok: false, reason: 'incomplete' };
+    }
+  }
+
+  // Exactly 13 digits => valid
+  if (raw.length === 13) {
     setValid(input);
-    return true;
+    removeInputTooltip(input);
+    return { ok: true, exact13: true };
+  }
+
+  // Fallback (shouldn't reach)
+ 
+  setInvalid(input);
+    return false;
+}
+
+// wrappers for existing names (keeps your code compatible)
+function validateJanCode(input) {
+  return validateJanGeneric(input, { enforceExact13: false }); // form-level live validation
+}
+function validateSkuJan(input) {
+  return validateJanGeneric(input, { enforceExact13: false }); // live validation in modal
 }
 
 function validatePrice(input,maxDigits) {
@@ -126,12 +231,12 @@ function validatePrice(input,maxDigits) {
 
     if (!raw) {
         setInvalid(input);
-        showAlert("Price must be a number and canot be empty");
+        showInputError(input,"Price must be a number and canot be empty");
         return false;
     }
     if(raw.length > maxDigits){
         raw =raw.slice(0,maxDigits);
-        showAlert(`Price cannot exceed ${maxDigits} digits`);
+        showInputError(input,`Price cannot exceed ${maxDigits} digits`);
     }
 
     
@@ -142,29 +247,35 @@ function validatePrice(input,maxDigits) {
     return true;
 }
 function validateSkuDigits(input) {
-    if (!input) return;
+    let val = input.value.replace(/\D/g, '');
+    input.value = val;
 
-    // Always strip non-digits
-    let digits = input.value.replace(/\D/g, '');
+    // --- STOCK FIELD SPECIAL RULE ---
+    const isStock = input.classList.contains("stock-quantity");
 
-    // Block leading zero
-    if (digits.startsWith('0')) {
-        showAlert("Value cannot start with 0");
-        digits = digits.substring(1);
-    }
-
-    // Update field
-    input.value = digits;
-
-    // Empty → invalid
-    if (digits.length === 0) {
+    // Empty
+    //  if (val.length === 0) {
+    //     setInvalid(input);
+    //     showInputError(input,"SKU JanCd is  cannot be empty. ")
+    //     return false;
+    // }
+    if (val.length === 0) {
         setInvalid(input);
-        showAlert("This field cannot be empty and must contain digits only.");
+        showInputError(input,"cannot be empty")
+        if (isStock) {
+            // showAlert("Stock cannot be empty and must be a number");
+                    showInputError(input,"cannot be empty")
+
+        } else {
+            showInputError(input, "Digits only — cannot be empty");
+        }
+
         return false;
     }
 
-    // If all OK
+    // Valid
     setValid(input);
+    removeInputTooltip(input);
     return true;
 }
 
@@ -174,22 +285,24 @@ function validateSkuJan(input) {
 
     // ❌ Don't allow first digit = 0
     if (digits.startsWith("0")) {
-        showAlert("JAN cannot start with 0");
+        showInputError(input,"JAN cannot start with 0");
         digits = digits.substring(1); // remove the leading zero
     }
 
     // ❌ Limit to 13 digits max
     if (digits.length > 13) {
         digits = digits.substring(0, 13); // cut extra digits
-        showAlert("JAN cannot be more than 13 digits");
+        showInputError(input,"JAN cannot be more than 13 digits");
     }
-
+if (digits.length < 13) {
+        showInputError(input,"JAN cannot be Less than 13 digits");
+    }
     input.value = digits;
 
     // ❌ If empty → invalid
     if (digits.length === 0) {
         setInvalid(input);
-        showAlert("SKU JanCd is  cannot be empty. ")
+        showInputError(input,"SKU JanCd is  cannot be empty. ")
         return false;
     }
 
@@ -205,6 +318,7 @@ function validateSkuJan(input) {
 }
 
 
+
 function validateSkuRow(row) {
     const sizeName = row.querySelector('.size-name');
     const colorName = row.querySelector('.color-name');
@@ -216,25 +330,25 @@ function validateSkuRow(row) {
     // Size Name
     if (!sizeName.value.trim()) {
         setInvalid(sizeName);
-        showAlert('Size Name is required.');
+        showInputError(input,'Size Name is required.');
     } else setValid(sizeName);
 
     // Color Name
     if (!colorName.value.trim()) {
         setInvalid(colorName);
-        showAlert('Color Name is required.');
+        showInputError(input,'Color Name is required.');
     } else setValid(colorName);
 
     // Size Code
     if (!sizeCode.value.trim()) {
         setInvalid(sizeCode);
-        showAlert('Size Code is required.');
+        showInputError(input,'Size Code is required.');
     } else setValid(sizeCode);
 
     // Color Code
     if (!colorCode.value.trim()) {
         setInvalid(colorCode);
-        showAlert('Color Code is required.');
+        showInputError(input,'Color Code is required.');
     } else setValid(colorCode);
 
     // JAN Code
@@ -243,7 +357,7 @@ function validateSkuRow(row) {
     // Stock
     if (stock.value === '' || isNaN(stock.value) || Number(stock.value) < 0) {
         setInvalid(stock);
-        showAlert('Stock must be a number and cannot be negative.');
+        showInputError(input,'Stock must be a number and cannot be negative.');
     } else {
         setValid(stock);
     }
@@ -317,6 +431,7 @@ function attachSkuRowValidation(row) {
         n.addEventListener('input', () => validateSkuDigits(n));
     });
 
+    
     const skuJan = row.querySelector('.jan-code');
     if (skuJan) {
         skuJan.addEventListener('input', () => validateSkuJan(skuJan));

@@ -50,7 +50,9 @@
 </head>
 
 <body class="bg-gradient-to-br from-blue-50 to-indigo-100 min-h-screen font-sans">
-    <div class="container mx-auto px-4 py-8">
+  @include('layout.sidebar')
+   
+<div class="container mx-auto px-4 py-8">
         <!-- Header Section -->
         <div class="flex flex-col lg:flex-row justify-between items-start lg:items-center mb-8 gap-4 fade-in">
             <div>
@@ -82,11 +84,7 @@
 
                 <!-- Export Buttons (Kept for completeness) -->
            <div class="flex flex-wrap gap-2 w-full lg:w-auto">
-    <!-- <button id="importBtn"
-        class="bg-gray-500 hover:bg-gray-600 text-white px-4 py-3 rounded-xl transition-all duration-200 transform hover:scale-105 flex items-center gap-2 font-medium">
-        <i class="fas fa-file-import"></i>
-        Import
-    </button> -->
+   
   <a href="{{ route('export.all') }}"
    class="bg-green-500 hover:bg-green-600 text-white px-4 py-3 rounded-xl transition-all duration-200 transform hover:scale-105 flex items-center gap-2 font-medium">
    <i class="fas fa-file-excel"></i>
@@ -551,7 +549,149 @@
 
     
     <script>
+ document.getElementById('sidebarToggle').addEventListener('click', function() {
+      const sidebar = document.querySelector('.sidebar');
+      const overlay = document.getElementById('sidebarOverlay');
+      sidebar.classList.toggle('active');
+      overlay.classList.toggle('active');
+      document.body.style.overflow = sidebar.classList.contains('active') ? 'hidden' : '';
+    });
 
+    document.getElementById('sidebarOverlay').addEventListener('click', function() {
+      const sidebar = document.querySelector('.sidebar');
+      const overlay = document.getElementById('sidebarOverlay');
+      sidebar.classList.remove('active');
+      overlay.classList.remove('active');
+      document.body.style.overflow = '';
+    });
+
+    // Close sidebar on mobile when clicking a link
+    document.querySelectorAll('.sidebar a, .sidebar button').forEach(item => {
+      item.addEventListener('click', function() {
+        if (window.innerWidth < 1024) {
+          const sidebar = document.querySelector('.sidebar');
+          const overlay = document.getElementById('sidebarOverlay');
+          sidebar.classList.remove('active');
+          overlay.classList.remove('active');
+          document.body.style.overflow = '';
+        }
+      });
+    });
+
+    // Excel Import Modal
+    const excelModal = document.getElementById('excelModal');
+    const openExcelModalBtn = document.getElementById('openExcelModal');
+    const closeExcelModalBtn = document.getElementById('closeExcelModal');
+    const cancelExcelImportBtn = document.getElementById('cancelExcelImport');
+    const excelFileInput = document.getElementById('excelFile');
+    const fileInfo = document.getElementById('fileInfo');
+    const fileName = document.getElementById('fileName');
+    const fileSize = document.getElementById('fileSize');
+    const removeFileBtn = document.getElementById('removeFile');
+    const startImportBtn = document.getElementById('startImport');
+
+    openExcelModalBtn.addEventListener('click', () => {
+      excelModal.classList.add('active');
+      document.body.style.overflow = 'hidden';
+    });
+
+    closeExcelModalBtn.addEventListener('click', () => {
+      excelModal.classList.remove('active');
+      document.body.style.overflow = '';
+    });
+
+    cancelExcelImportBtn.addEventListener('click', () => {
+      excelModal.classList.remove('active');
+      document.body.style.overflow = '';
+    });
+
+    // File upload handling
+    excelFileInput.addEventListener('change', function(e) {
+      if (e.target.files.length > 0) {
+        const file = e.target.files[0];
+        const fileSizeMB = (file.size / (1024 * 1024)).toFixed(2);
+        
+        fileName.textContent = file.name;
+        fileSize.textContent = `${fileSizeMB} MB`;
+        fileInfo.classList.remove('hidden');
+        startImportBtn.disabled = false;
+        
+        // Validate file type
+        const validTypes = ['application/vnd.ms-excel', 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet', 'text/csv'];
+        if (!validTypes.includes(file.type) && !file.name.match(/\.(xlsx|xls|csv)$/)) {
+          alert('Please upload a valid Excel file (.xlsx, .xls, .csv)');
+          resetFileInput();
+        }
+      }
+    });
+
+    // Drag and drop for file upload
+    const uploadArea = document.querySelector('.image-upload-box');
+    uploadArea.addEventListener('dragover', (e) => {
+      e.preventDefault();
+      uploadArea.classList.add('dragover');
+    });
+
+    uploadArea.addEventListener('dragleave', () => {
+      uploadArea.classList.remove('dragover');
+    });
+
+    uploadArea.addEventListener('drop', (e) => {
+      e.preventDefault();
+      uploadArea.classList.remove('dragover');
+      
+      if (e.dataTransfer.files.length > 0) {
+        excelFileInput.files = e.dataTransfer.files;
+        const event = new Event('change');
+        excelFileInput.dispatchEvent(event);
+      }
+    });
+
+    removeFileBtn.addEventListener('click', resetFileInput);
+
+    function resetFileInput() {
+      excelFileInput.value = '';
+      fileInfo.classList.add('hidden');
+      startImportBtn.disabled = true;
+    }
+
+    // Start import button
+    startImportBtn.addEventListener('click', function() {
+      if (!excelFileInput.files.length) {
+        alert('Please select a file first');
+        return;
+      }
+
+      // Show loading state
+      const originalText = this.innerHTML;
+      this.innerHTML = `
+        <svg class="w-5 h-5 animate-spin" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path>
+        </svg>
+        Importing...
+      `;
+      this.disabled = true;
+
+      // Simulate import process (replace with actual API call)
+      setTimeout(() => {
+        alert('Import completed successfully!');
+        this.innerHTML = originalText;
+        this.disabled = false;
+        excelModal.classList.remove('active');
+        document.body.style.overflow = '';
+        resetFileInput();
+      }, 2000);
+    });
+
+    // Close modals on ESC key
+    document.addEventListener('keydown', function(e) {
+      if (e.key === 'Escape') {
+        document.querySelectorAll('.modal-overlay.active').forEach(modal => {
+          modal.classList.remove('active');
+        });
+        document.body.style.overflow = '';
+      }
+    });
         window.openSkuModal = function(button) {
     const modal = document.getElementById('skuModal');
     const content = document.getElementById('skuModalContent');

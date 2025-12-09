@@ -45,6 +45,38 @@
         .sku-content {
     display: block;
 }
+#paginationControls {
+    display: flex;
+    gap: 8px;
+    margin-top: 20px;
+}
+
+#paginationControls button {
+    padding: 8px 14px;
+    border-radius: 10px;
+    border: 1px solid #d1d5db; /* gray-300 */
+    background: white;
+    cursor: pointer;
+    font-size: 14px;
+    transition: all 0.2s ease-in-out;
+}
+
+#paginationControls button:hover {
+    background: #eef2ff; /* indigo-50 */
+    border-color: #6366f1; /* indigo-500 */
+    color: #4f46e5; /* indigo-600 */
+}
+
+#paginationControls button.active {
+    background: #6366f1; /* indigo-500 */
+    color: white;
+    border-color: #4f46e5;
+}
+
+#paginationControls button:active {
+    transform: scale(0.95);
+}
+
 
     </style>
 </head>
@@ -268,6 +300,7 @@
                   <!-- 3. Pricing & SKU Stock -->
                             <div class="lg:px-6 lg:py-4 lg:border-r border-gray-100 pt-4 lg:pt-0">
                                 <div class="space-y-4">
+                                    
                                    {{-- ========================================================= --}}
 {{-- 1. JavaScript Functions (Define before usage) --}}
 {{-- ========================================================= --}}
@@ -470,25 +503,16 @@
                     </div>
                 </div>
             </div>
-            <div class="bg-gradient-to-br from-orange-500 to-orange-600 text-white rounded-2xl p-6 shadow-lg transform hover:scale-105 transition-all duration-300">
-                <div class="flex items-center justify-between">
-                    <div>
-                        <p class="text-orange-100 text-sm font-semibold">Last Added</p>
-                        <p class="text-2xl font-bold mt-2">
-                            @php
-                                $lastItem = $items->sortByDesc('created_at')->first();
-                            @endphp
-                            {{ $lastItem && $lastItem->created_at ? $lastItem->created_at->format('M j') : '-' }}
-                        </p>
-                    </div>
-                    <div class="w-14 h-14 bg-orange-400 rounded-xl flex items-center justify-center bg-opacity-20">
-                        <i class="fas fa-calendar-plus text-2xl"></i>
-                    </div>
+    <div class="col-span-1 md:col-span-2 lg:col-span-4 flex justify-end">
+                    
+                               <div id="pagination" class="flex justify-end items-center gap-2 mt-4"></div>
                 </div>
-            </div>
         </div>
         @endif
+        
     </div>
+
+
     
     <!-- Image Gallery Modal -->
     <div id="imageGalleryModal" class="modal-overlay">
@@ -547,151 +571,9 @@
     </div>
 </div>
 
-    
+   
     <script>
- document.getElementById('sidebarToggle').addEventListener('click', function() {
-      const sidebar = document.querySelector('.sidebar');
-      const overlay = document.getElementById('sidebarOverlay');
-      sidebar.classList.toggle('active');
-      overlay.classList.toggle('active');
-      document.body.style.overflow = sidebar.classList.contains('active') ? 'hidden' : '';
-    });
 
-    document.getElementById('sidebarOverlay').addEventListener('click', function() {
-      const sidebar = document.querySelector('.sidebar');
-      const overlay = document.getElementById('sidebarOverlay');
-      sidebar.classList.remove('active');
-      overlay.classList.remove('active');
-      document.body.style.overflow = '';
-    });
-
-    // Close sidebar on mobile when clicking a link
-    document.querySelectorAll('.sidebar a, .sidebar button').forEach(item => {
-      item.addEventListener('click', function() {
-        if (window.innerWidth < 1024) {
-          const sidebar = document.querySelector('.sidebar');
-          const overlay = document.getElementById('sidebarOverlay');
-          sidebar.classList.remove('active');
-          overlay.classList.remove('active');
-          document.body.style.overflow = '';
-        }
-      });
-    });
-
-    // Excel Import Modal
-    const excelModal = document.getElementById('excelModal');
-    const openExcelModalBtn = document.getElementById('openExcelModal');
-    const closeExcelModalBtn = document.getElementById('closeExcelModal');
-    const cancelExcelImportBtn = document.getElementById('cancelExcelImport');
-    const excelFileInput = document.getElementById('excelFile');
-    const fileInfo = document.getElementById('fileInfo');
-    const fileName = document.getElementById('fileName');
-    const fileSize = document.getElementById('fileSize');
-    const removeFileBtn = document.getElementById('removeFile');
-    const startImportBtn = document.getElementById('startImport');
-
-    openExcelModalBtn.addEventListener('click', () => {
-      excelModal.classList.add('active');
-      document.body.style.overflow = 'hidden';
-    });
-
-    closeExcelModalBtn.addEventListener('click', () => {
-      excelModal.classList.remove('active');
-      document.body.style.overflow = '';
-    });
-
-    cancelExcelImportBtn.addEventListener('click', () => {
-      excelModal.classList.remove('active');
-      document.body.style.overflow = '';
-    });
-
-    // File upload handling
-    excelFileInput.addEventListener('change', function(e) {
-      if (e.target.files.length > 0) {
-        const file = e.target.files[0];
-        const fileSizeMB = (file.size / (1024 * 1024)).toFixed(2);
-        
-        fileName.textContent = file.name;
-        fileSize.textContent = `${fileSizeMB} MB`;
-        fileInfo.classList.remove('hidden');
-        startImportBtn.disabled = false;
-        
-        // Validate file type
-        const validTypes = ['application/vnd.ms-excel', 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet', 'text/csv'];
-        if (!validTypes.includes(file.type) && !file.name.match(/\.(xlsx|xls|csv)$/)) {
-          alert('Please upload a valid Excel file (.xlsx, .xls, .csv)');
-          resetFileInput();
-        }
-      }
-    });
-
-    // Drag and drop for file upload
-    const uploadArea = document.querySelector('.image-upload-box');
-    uploadArea.addEventListener('dragover', (e) => {
-      e.preventDefault();
-      uploadArea.classList.add('dragover');
-    });
-
-    uploadArea.addEventListener('dragleave', () => {
-      uploadArea.classList.remove('dragover');
-    });
-
-    uploadArea.addEventListener('drop', (e) => {
-      e.preventDefault();
-      uploadArea.classList.remove('dragover');
-      
-      if (e.dataTransfer.files.length > 0) {
-        excelFileInput.files = e.dataTransfer.files;
-        const event = new Event('change');
-        excelFileInput.dispatchEvent(event);
-      }
-    });
-
-    removeFileBtn.addEventListener('click', resetFileInput);
-
-    function resetFileInput() {
-      excelFileInput.value = '';
-      fileInfo.classList.add('hidden');
-      startImportBtn.disabled = true;
-    }
-
-    // Start import button
-    startImportBtn.addEventListener('click', function() {
-      if (!excelFileInput.files.length) {
-        alert('Please select a file first');
-        return;
-      }
-
-      // Show loading state
-      const originalText = this.innerHTML;
-      this.innerHTML = `
-        <svg class="w-5 h-5 animate-spin" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path>
-        </svg>
-        Importing...
-      `;
-      this.disabled = true;
-
-      // Simulate import process (replace with actual API call)
-      setTimeout(() => {
-        alert('Import completed successfully!');
-        this.innerHTML = originalText;
-        this.disabled = false;
-        excelModal.classList.remove('active');
-        document.body.style.overflow = '';
-        resetFileInput();
-      }, 2000);
-    });
-
-    // Close modals on ESC key
-    document.addEventListener('keydown', function(e) {
-      if (e.key === 'Escape') {
-        document.querySelectorAll('.modal-overlay.active').forEach(modal => {
-          modal.classList.remove('active');
-        });
-        document.body.style.overflow = '';
-      }
-    });
         window.openSkuModal = function(button) {
     const modal = document.getElementById('skuModal');
     const content = document.getElementById('skuModalContent');
@@ -842,46 +724,6 @@ document.addEventListener('DOMContentLoaded', function () {
 });
 
 
-const importBtn = document.getElementById('importBtn');
-const importModal = document.getElementById('importModal');
-const closeModal = document.getElementById('closeModal');
-const importForm = document.getElementById('importForm');
-
-importBtn.addEventListener('click', () => {
-    importModal.classList.remove('hidden');
-    importModal.classList.add('flex');
-});
-
-closeModal.addEventListener('click', () => {
-    importModal.classList.add('hidden');
-    importModal.classList.remove('flex');
-});
-
-importForm.addEventListener('submit', (e) => {
-    e.preventDefault();
-
-    const file = document.getElementById('importFile').files[0];
-    const importType = document.querySelector('input[name="importType"]:checked').value;
-
-    if (!file) return alert('Please select a file');
-
-    console.log('Importing', importType, 'with file', file);
-
-    // TODO: send file and type to server via AJAX/fetch
-    // e.g. FormData -> POST /import-items
-});
-
-
-
-window.closeSkuModal = function() {
-    document.getElementById('skuModal').classList.add('hidden');
-};
-
-
-// Optional: close modal when clicking outside
-document.getElementById('skuModal').addEventListener('click', (e) => {
-    if (e.target === document.getElementById('skuModal')) closeSkuModal();
-});
 
 
 
@@ -991,23 +833,89 @@ function openImageGalleryFromElement(el) {
 function closeDeleteModal() {
     document.getElementById('deleteModal').classList.add('hidden');
 }
+const rows = document.getElementById("itemTableBody").children;
+const itemsPerPage = 10;
+let currentPage = 1;
+let filteredRows = Array.from(rows);
 
-        
-        // Simple client-side search functionality
-        document.getElementById('searchInput').addEventListener('keyup', function() {
-            const query = this.value.toLowerCase();
-            const rows = document.getElementById('itemTableBody').children;
+function renderTable() {
+    Array.from(rows).forEach(r => (r.style.display = "none"));
 
-            for (let i = 0; i < rows.length; i++) {
-                const row = rows[i];
-                const searchableText = row.getAttribute('data-searchable');
-                if (searchableText.includes(query)) {
-                    row.style.display = '';
-                } else {
-                    row.style.display = 'none';
-                }
-            }
-        });
+    const start = (currentPage - 1) * itemsPerPage;
+    const end = start + itemsPerPage;
+
+    filteredRows.slice(start, end).forEach(r => (r.style.display = ""));
+
+    renderPagination();
+}
+
+function renderPagination() {
+    const totalPages = Math.ceil(filteredRows.length / itemsPerPage);
+    const container = document.getElementById("pagination");
+    container.innerHTML = ""; // Reset first
+
+    // --- Prev Button ---
+    const prevBtn = document.createElement("button");
+    prevBtn.textContent = "Prev";
+    prevBtn.className = "px-3 py-1 bg-gray-200 rounded";
+    prevBtn.disabled = currentPage === 1;
+    prevBtn.onclick = () => {
+        currentPage--;
+        renderTable();
+    };
+    container.appendChild(prevBtn);
+
+    // --- Page Number Buttons ---
+    for (let i = 1; i <= totalPages; i++) {
+        const pageBtn = document.createElement("button");
+        pageBtn.textContent = i;
+        pageBtn.className =
+            "px-3 py-1 rounded " +
+            (i === currentPage ? "bg-indigo-500 text-white" : "bg-gray-200");
+
+        pageBtn.onclick = () => {
+            currentPage = i;
+            renderTable();
+        };
+
+        container.appendChild(pageBtn);
+    }
+
+    // --- Next Button ---
+    const nextBtn = document.createElement("button");
+    nextBtn.textContent = "Next";
+    nextBtn.className = "px-3 py-1 bg-gray-200 rounded";
+    nextBtn.disabled = currentPage === totalPages;
+    nextBtn.onclick = () => {
+        currentPage++;
+        renderTable();
+    };
+    container.appendChild(nextBtn);
+}
+
+// --- Search with comma support ---
+document.getElementById("searchInput").addEventListener("keyup", function () {
+    const input = this.value.toLowerCase();
+
+    const keywords = input
+        .split(",")
+        .map(k => k.trim())
+        .filter(k => k.length > 0);
+
+    filteredRows = Array.from(rows).filter(row => {
+        const searchable = row.getAttribute("data-searchable").toLowerCase();
+        if (keywords.length === 0) return true;
+        return keywords.some(keyword => searchable.includes(keyword));
+    });
+
+    currentPage = 1; // Reset page after search
+    renderTable();
+});
+
+// Initial display
+renderTable();
+
+
     </script>
 </body>
 

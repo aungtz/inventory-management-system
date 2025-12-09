@@ -1,49 +1,37 @@
 // --------------------
 // Common Validation UI
 // --------------------
-function showAlert(message) {
-    let box = document.getElementById("alert-box");
+function showInputError(input, message, { autoHide = true, duration = 5000 } = {}) {
+    const wrapper = input.closest(".input-wrap");
+    if (!wrapper) return;
 
-    if (!box) {
-        box = document.createElement("div");
-        box.id = "alert-box";
-        box.className = "fixed top-5 right-5 bg-red-500 text-white px-4 py-3 rounded-lg shadow-lg z-50";
-        document.body.appendChild(box);
+    const errorText = wrapper.querySelector(".error-text");
+    if (!errorText) return;
+
+    // Remove any old icon
+    wrapper.querySelectorAll(".error-icon").forEach(i => i.remove());
+
+    // Insert warning icon inside input
+    
+
+    // Red border
+    input.classList.remove("border-green-500");
+    input.classList.add("border-red-500");
+
+    // Show error message
+    errorText.textContent = message;
+    errorText.classList.remove("hidden");
+
+    // Auto-hide after duration
+    if (autoHide) {
+        setTimeout(() => {
+            errorText.classList.add("hidden");
+            wrapper.querySelectorAll(".error-icon").forEach(i => i.remove());
+            input.classList.remove("border-red-500");
+        }, duration);
     }
-
-    box.textContent = message;
-    box.style.display = "block";
-
-    setTimeout(() => {
-        box.style.display = "none";
-    }, 1500);
 }
 
-function showInputError(input, message) {
-    // remove old tooltip if exists
-    let old = input.parentNode.querySelector(".input-error-tooltip");
-    if (old) old.remove();
-
-    // create tooltip
-    let tip = document.createElement("div");
-    tip.className = "input-error-tooltip";
-    tip.textContent = message;
-
-    // ensure parent is position:relative
-    input.parentNode.style.position = "relative";
-
-    // insert after input
-    input.parentNode.appendChild(tip);
-
-    // auto remove
-    setTimeout(() => {
-        tip.remove();
-    }, 1500);
-}
-function removeInputTooltip(input) {
-    const old = input.parentNode.querySelector(".input-error-tooltip");
-    if (old) old.remove();
-}
 
 
 function setValid(input) {
@@ -144,79 +132,211 @@ function validateMemo(input) {
     setValid(input);
     return true;
 }
-function validateJanGeneric(input, { enforceExact13 = false } = {}) {
-  if (!input) return { ok: false, reason: 'missing input' };
 
-  // sanitize digits only
-  let raw = input.value.replace(/\D/g, '');
 
-  // If first char is '0' => show message and refuse to accept that zero.
-  if (raw.startsWith('0')) {
-    // remove the leading zero(s). Show message and stop validation here.
-    raw = raw.replace(/^0+/, ''); // remove all leading zeros safely
-    input.value = raw;
-    setInvalid(input);
-    showInputError(input, 'JAN cannot start with 0');
-    return { ok: false, reason: 'starts-with-0' };
-  }
 
-  // Trim to maximum 13 digits (prevents typing beyond)
-  if (raw.length > 13) {
-    raw = raw.slice(0, 13);
-    input.value = raw;
-    setInvalid(input);
-    showInputError(input, 'JAN cannot exceed 13 digits');
-    return { ok: false, reason: 'too-long' };
-  }
+//old code for janCD
+// function validateJanGeneric(input, { enforceExact13 = false } = {}) {
+//   if (!input) return { ok: false, reason: 'missing input' };
 
-  input.value = raw; // keep input synced
+//   // sanitize digits only
+//   let raw = input.value.replace(/\D/g, '');
 
-   if (raw.length === 0) {
-        setInvalid(input);
-        showInputError(input,"SKU JanCd is  cannot be empty. ")
-        return false;
-    }
-  // Empty check
-  if (raw.length === 0) {
-    setInvalid(input);
-    if (enforceExact13) {
-      showInputError(input, 'JAN cannot be empty');
-    }
+//   // If first char is '0' => show message and refuse to accept that zero.
+//   if (raw.startsWith('0')) {
+//     // remove the leading zero(s). Show message and stop validation here.
+//     raw = raw.replace(/^0+/, ''); // remove all leading zeros safely
+//     input.value = raw;
+//     setInvalid(input);
+    
+//     showInputError(input, 'JAN cannot start with 0');
+//     return { ok: false, reason: 'starts-with-0' };
+//   }
+
+//   // Trim to maximum 13 digits (prevents typing beyond)
+//   if (raw.length > 13) {
+//     raw = raw.slice(0, 13);
+//     input.value = raw;
+//     setInvalid(input);
+//     showInputError(input, 'JAN cannot exceed 13 digits');
+//     return { ok: false, reason: 'too-long' };
+//   }
+
+//   input.value = raw; // keep input synced
+
+//    if (raw.length === 0) {
+//         setInvalid(input);
+//         showInputError(input,"SKU JanCd is  cannot be empty. ")
+//         return false;
+//     }
+//   // Empty check
+//   if (raw.length === 0) {
+//     setInvalid(input);
+//     if (enforceExact13) {
+//       showInputError(input, 'JAN cannot be empty');
+//     }
 
 
    
-    return { ok: false, reason: 'empty' };
-  }
+//     return { ok: false, reason: 'empty' };
+//   }
 
-  // If we require exact 13 (for save) but not yet 13, show message
-  if (enforceExact13 && raw.length !== 13) {
-    setInvalid(input);
-    showInputError(input, 'JAN must be exactly 13 digits');
-    return { ok: false, reason: 'not-13' };
-  }
+//   // If we require exact 13 (for save) but not yet 13, show message
+//   if (enforceExact13 && raw.length !== 13) {
+//     setInvalid(input);
+//     showInputError(input, 'JAN must be exactly 13 digits');
+//     return { ok: false, reason: 'not-13' };
+//   }
 
-  // Not enforcing exact13 (live typing): if <13 then accept as "incomplete" but mark invalid
-  if (!enforceExact13) {
-    if (raw.length < 13) {
-      setInvalid(input);
-      // show a light temporary tooltip (don't spam). optional:
-      showInputError(input, `JAN incomplete (${raw.length}/13)`, { autoHide: 900 });
-      return { ok: false, reason: 'incomplete' };
-    }
-  }
+//   // Not enforcing exact13 (live typing): if <13 then accept as "incomplete" but mark invalid
+//   if (!enforceExact13) {
+//     if (raw.length < 13) {
+//       setInvalid(input);
+//       // show a light temporary tooltip (don't spam). optional:
+//       showInputError(input, `JAN incomplete (${raw.length}/13)`, { autoHide: 900 });
+//       return { ok: false, reason: 'incomplete' };
+//     }
+//   }
 
-  // Exactly 13 digits => valid
-  if (raw.length === 13) {
-    setValid(input);
-    removeInputTooltip(input);
-    return { ok: true, exact13: true };
-  }
+//   // Exactly 13 digits => valid
+//   if (raw.length === 13) {
+//     setValid(input);
+//     return { ok: true, exact13: true };
+//   }
 
-  // Fallback (shouldn't reach)
+//   // Fallback (shouldn't reach)
  
-  setInvalid(input);
-    return false;
-}
+//   setInvalid(input);
+//     return false;
+// }
+
+
+
+
+         const janInput = document.getElementById('janInput');
+        const janError = document.getElementById('janError');
+        const submitButton = document.getElementById('submitButton');
+
+
+ function validateJanGeneric(input, { enforceExact13 = false } = {}) {
+            if (!input) return { ok: false, reason: 'missing input', raw: '' };
+
+            // 1. Sanitize: Keep digits only
+            let raw = input.value.replace(/\D/g, '');
+
+            // Update input value immediately (to remove non-digits)
+            input.value = raw;
+            
+            // 2. Max length check (if input is still longer than 13 after sanitization, which shouldn't happen with type="text" but is good practice)
+            if (raw.length > 13) {
+                raw = raw.slice(0, 13);
+                input.value = raw;
+                setInvalid(input);
+                showInputError(input, 'JAN cannot exceed 13 digits');
+                return { ok: false, reason: 'too-long', raw };
+            }
+
+            // 3. Empty check (Highest priority)
+            if (raw.length === 0) {
+                setInvalid(input);
+                showInputError(input, 'JAN cannot be empty');
+                if (enforceExact13) {
+                    showInputError(input, 'JAN cannot be empty');
+                }
+                return { ok: false, reason: 'empty', raw };
+            }
+
+            // 4. Leading zero check (Highest priority after empty)
+            if (raw.startsWith('0')) {
+                // We keep the input synced but inform the user this is an error
+                setInvalid(input);
+                showInputError(input, 'JAN cannot start with 0');
+                return { ok: false, reason: 'starts-with-0', raw };
+            }
+
+            // --- Check for Validity based on length ---
+
+            // Check 5A: Exact 13 digits => Valid
+            if (raw.length === 13) {
+                setValid(input);
+                // NOTE: Check digit validation would happen here if implemented.
+                return { ok: true, reason: 'valid', raw };
+            }
+
+            // Check 5B: Enforcing exact 13 (e.g., on submit) but length is wrong
+            if (enforceExact13 && raw.length !== 13) {
+                setInvalid(input);
+                showInputError(input, `JAN must be exactly 13 digits (currently ${raw.length})`);
+                return { ok: false, reason: 'not-13', raw };
+            }
+
+            // Check 5C: Not enforcing exact 13 (live typing) and length < 13 => Incomplete
+            if (!enforceExact13 && raw.length < 13) {
+                setInvalid(input);
+                // Only show a temporary, non-blocking error for being incomplete
+                showInputError(input, `JAN incomplete (${raw.length}/13)`, { autoHide: 900 });
+                return { ok: false, reason: 'incomplete', raw };
+            }
+            
+            // Fallback (e.g., if somehow raw.length is 14 but didn't trigger length check)
+            setInvalid(input);
+            showInputError(input, 'Unknown validation error');
+            return { ok: false, reason: 'unknown', raw };
+        }
+  const handleInput = () => {
+            // Validate in "live typing" mode using the requested wrapper function
+            const result = validateJanCode(janInput);
+
+            // Get the span element inside the button to update its text content
+            const buttonTextSpan = submitButton.querySelector('span');
+
+            // Update submit button state
+            if (result.ok) {
+                // Valid (exactly 13 digits, no leading zero)
+                submitButton.disabled = false;
+                buttonTextSpan.textContent = 'Save Item'; 
+                setValid(janInput);
+            } else {
+                // Invalid or Incomplete
+                submitButton.disabled = true;
+                
+                // Show a more specific message on the button if it's just incomplete
+                if (result.reason === 'incomplete') {
+                    buttonTextSpan.textContent = `Requires ${13 - result.raw.length} more digits in Jancd`;
+                } else {
+                    buttonTextSpan.textContent = 'Fix Errors to Save'; // Generic error message
+                }
+                setInvalid(janInput);
+            }
+        };
+
+        /**
+         * Event listener for form submission to handle final validation (enforceExact13: true).
+         */
+        const handleSubmit = (event) => {
+            event.preventDefault();
+            
+            // Re-validate in strict mode (enforceExact13: true) using the generic function
+            const finalResult = validateJanGeneric(janInput, { enforceExact13: true });
+
+            // if (finalResult.ok) {
+            //     alert(`SUCCESS! Valid JAN code submitted: ${finalResult.raw}`);
+            //     // In a real application, you would make an API call here.
+            // } else {
+            //     // This shouldn't be reachable if the button is disabled correctly, 
+            //     // but handles edge cases like manual form submission.
+            //     console.error('Submission blocked. Reason:', finalResult.reason);
+            //     showInputError(janInput, `Submission failed: ${finalResult.reason}. Fix the input.`);
+            // }
+        };
+
+        // --- Setup Event Listeners ---
+        janInput.addEventListener('input', handleInput);
+        document.getElementById('itemForm').addEventListener('submit', handleSubmit);
+        
+        // Initial run to set button state (if the field loads with pre-filled data)
+        handleInput();
+
 
 // wrappers for existing names (keeps your code compatible)
 function validateJanCode(input) {
@@ -275,7 +395,6 @@ function validateSkuDigits(input) {
 
     // Valid
     setValid(input);
-    removeInputTooltip(input);
     return true;
 }
 

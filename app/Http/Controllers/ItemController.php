@@ -122,44 +122,55 @@ public function exportAll()
 }
 
 
-  if ($request->hasFile('images')) {
+// ... inside your store(Request $request) ...
+if ($request->hasFile('images')) {
+    $disk = Storage::disk('public');
+
     foreach ($request->file('images') as $index => $image) {
-        if ($image && $image->isValid() && $image->getSize() > 0) {
+        if (! $image || ! $image->isValid()) continue;
 
-            // 1. Get name input
-            $rawName = $request->input('image_names')[$index] ?? $image->getClientOriginalName();
+        // file extension
+        $ext = strtolower($image->getClientOriginalExtension());
+        $dotExt = '.' . $ext;
 
-            // Trim whitespace
-            $rawName = trim($rawName);
+        // sanitize Item_Code as base filename
+        $rawBase = $item->Item_Code ?? 'item';
+        $base = preg_replace('/[^A-Za-z0-9\-_]+/', '-', $rawBase);
+        $base = trim($base, '-_');
+        if ($base === '') $base = 'item';
 
-            // 2. Extract extension from uploaded file
-            $ext = strtolower($image->getClientOriginalExtension());
+        // next serial (001, 002...)
+        $maxSerial = ItemImage::where('Item_Code', $item->Item_Code)->max('Image_Serial');
+        $nextSerial = ($maxSerial ? intval($maxSerial) : 0) + 1;
+        $serialPadded = str_pad($nextSerial, 3, '0', STR_PAD_LEFT);
 
-            // 3. Check if the user already included an extension in name
-            if (preg_match('/\.(jpg|jpeg|png|gif|webp)$/i', $rawName)) {
-                // user already included extension → keep it
-                $baseName = pathinfo($rawName, PATHINFO_FILENAME);
-            } else {
-                // user did NOT include extension → append correct extension
-                $baseName = $rawName . '.' . $ext;
-            }
+        // final intended filename (WITH extension)
+        $candidate = $base . '-' . $serialPadded . $dotExt;
 
-            // 4. Build final filename (unique)
-            $filename =  '_' . preg_replace('/\s+/', '_', $baseName);
-
-            // 5. Store file
-            $image->storeAs('items', $filename, 'public');
-
-            // 6. Save to DB
-            ItemImage::create([
-                'Item_Code'   => $item->Item_Code,
-                'Image_Name'  => $filename,
-                'CreatedDate' => now(),
-                'UpdatedDate' => now(),
-            ]);
+        // ensure uniqueness (VERY rare)
+        $path = 'items/' . $candidate;
+        $counter = 1;
+        while ($disk->exists($path)) {
+            $candidate = $base . '-' . $serialPadded . '-' . $counter . $dotExt;
+            $path = 'items/' . $candidate;
+            $counter++;
         }
+
+        // store file
+        $image->storeAs('items', $candidate, 'public');
+
+        // save DB record
+        ItemImage::create([
+            'Item_Code'    => $item->Item_Code,
+            'Image_Name'   => $candidate,
+            'Image_Serial' => $nextSerial, // correct serial
+            'CreatedDate'  => now(),
+            'UpdatedDate'  => now(),
+        ]);
     }
 }
+
+
 
 
     return redirect()->route('items.index')->with('success', 'Item saved successfully!');

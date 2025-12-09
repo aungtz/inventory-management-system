@@ -60,6 +60,12 @@
                     </h1>
                     <p class="text-gray-600 mt-2">Track and manage your import history</p>
                 </div>
+                @if(request()->has('success'))
+                <div class="p-4 mb-4 text-green-800 bg-green-100 border border-green-300 rounded-lg">
+                    ✅ Import completed successfully!
+                </div>
+                @endif
+
                 
                 <!-- Import Type Buttons -->
                 <div class="flex flex-wrap gap-3">
@@ -125,251 +131,84 @@
                             <th class="p-4 text-left font-semibold">Create Date</th>
                             <th class="p-4 text-left font-semibold">Manager</th>
                             <th class="p-4 text-left font-semibold">Datatype</th>
-                            <th class="p-4 text-left font-semibold">Number of Data Items</th>
+                            <th class="p-4 text-left font-semibold">Number of Valid</th>
                             <th class="p-4 text-left font-semibold">Number of Errors</th>
                             <th class="p-4 text-left font-semibold">Status</th>
                         </tr>
                     </thead>
                     <tbody class="divide-y divide-gray-200">
                         <!-- Row 1 -->
-                        <tr class="hover:bg-gray-50/50 transition-all duration-200">
-                            <td class="p-4">
-                                <a href="#" 
-                                   class="inline-flex items-center px-4 py-2 bg-gray-100 text-gray-700 rounded-lg font-medium hover:bg-indigo-50 hover:text-indigo-600 transition-all duration-300 transform hover:scale-105">
-                                    <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path>
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"></path>
-                                    </svg>
-                                    Detail
-                                </a>
-                            </td>
-                            <td class="p-4 text-gray-700">
-                                <div class="font-medium">2024-01-15</div>
-                                <div class="text-sm text-gray-500">10:30 AM</div>
-                            </td>
-                            <td class="p-4">
-                                <a href="#" 
-                                   class="font-medium text-indigo-600 hover:text-indigo-800 hover:underline transition-colors duration-200">
-                                    John Doe
-                                </a>
-                            </td>
-                            <td class="p-4">
-                                <a href="#" 
-                                   class="inline-flex items-center px-3 py-1 bg-indigo-100 text-indigo-800 rounded-full text-sm font-medium hover:bg-indigo-200 transition-all duration-200">
-                                    Item Master
-                                </a>
-                            </td>
-                            <td class="p-4">
-                                <a href="#" 
-                                   class="font-medium text-gray-800 hover:text-indigo-600 hover:underline transition-colors duration-200">
-                                    1,250 items
-                                </a>
-                            </td>
-                            <td class="p-4">
-                                <a href="#" 
-                                   class="font-medium text-red-600 hover:text-red-800 hover:underline transition-colors duration-200">
-                                    0 errors
-                                </a>
-                            </td>
-                            <td class="p-4">
-                                <span class="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-green-100 text-green-800">
-                                    <span class="w-2 h-2 rounded-full bg-green-500 mr-2"></span>
-                                    Success
-                                </span>
-                            </td>
-                        </tr>
+                       
                         
-                        <!-- Row 2 -->
-                        <tr class="hover:bg-gray-50/50 transition-all duration-200">
-                            <td class="p-4">
-                                <a href="#" 
-                                   class="inline-flex items-center px-4 py-2 bg-gray-100 text-gray-700 rounded-lg font-medium hover:bg-indigo-50 hover:text-indigo-600 transition-all duration-300 transform hover:scale-105">
-                                    <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path>
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"></path>
-                                    </svg>
-                                    Detail
-                                </a>
-                            </td>
-                            <td class="p-4 text-gray-700">
-                                <div class="font-medium">2024-01-14</div>
-                                <div class="text-sm text-gray-500">03:45 PM</div>
-                            </td>
-                            <td class="p-4">
-                                <a href="#" 
-                                   class="font-medium text-indigo-600 hover:text-indigo-800 hover:underline transition-colors duration-200">
-                                    Jane Smith
-                                </a>
-                            </td>
-                            <td class="p-4">
-                                <a href="#" 
-                                   class="inline-flex items-center px-3 py-1 bg-purple-100 text-purple-800 rounded-full text-sm font-medium hover:bg-purple-200 transition-all duration-200">
-                                    SKU Master
-                                </a>
-                            </td>
-                            <td class="p-4">
-                                <a href="#" 
-                                   class="font-medium text-gray-800 hover:text-indigo-600 hover:underline transition-colors duration-200">
-                                    850 items
-                                </a>
-                            </td>
-                            <td class="p-4">
-                                <a href="#" 
-                                   class="font-medium text-red-600 hover:text-red-800 hover:underline transition-colors duration-200">
-                                    12 errors
-                                </a>
-                            </td>
-                            <td class="p-4">
-                                <span class="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-yellow-100 text-yellow-800">
-                                    <span class="w-2 h-2 rounded-full bg-yellow-500 mr-2"></span>
-                                    With Errors
-                                </span>
-                            </td>
-                        </tr>
-                        
-                        <!-- Row 3 -->
-                        <tr class="hover:bg-gray-50/50 transition-all duration-200">
-                            <td class="p-4">
-                                <a href="#" 
-                                   class="inline-flex items-center px-4 py-2 bg-gray-100 text-gray-700 rounded-lg font-medium hover:bg-indigo-50 hover:text-indigo-600 transition-all duration-300 transform hover:scale-105">
-                                    <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path>
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"></path>
-                                    </svg>
-                                    Detail
-                                </a>
-                            </td>
-                            <td class="p-4 text-gray-700">
-                                <div class="font-medium">2024-01-13</div>
-                                <div class="text-sm text-gray-500">09:15 AM</div>
-                            </td>
-                            <td class="p-4">
-                                <a href="#" 
-                                   class="font-medium text-indigo-600 hover:text-indigo-800 hover:underline transition-colors duration-200">
-                                    Robert Johnson
-                                </a>
-                            </td>
-                            <td class="p-4">
-                                <a href="#" 
-                                   class="inline-flex items-center px-3 py-1 bg-indigo-100 text-indigo-800 rounded-full text-sm font-medium hover:bg-indigo-200 transition-all duration-200">
-                                    Item Master
-                                </a>
-                            </td>
-                            <td class="p-4">
-                                <a href="#" 
-                                   class="font-medium text-gray-800 hover:text-indigo-600 hover:underline transition-colors duration-200">
-                                    2,150 items
-                                </a>
-                            </td>
-                            <td class="p-4">
-                                <a href="#" 
-                                   class="font-medium text-red-600 hover:text-red-800 hover:underline transition-colors duration-200">
-                                    5 errors
-                                </a>
-                            </td>
-                            <td class="p-4">
-                                <span class="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-yellow-100 text-yellow-800">
-                                    <span class="w-2 h-2 rounded-full bg-yellow-500 mr-2"></span>
-                                    With Errors
-                                </span>
-                            </td>
-                        </tr>
-                        
-                        <!-- Row 4 -->
-                        <tr class="hover:bg-gray-50/50 transition-all duration-200">
-                            <td class="p-4">
-                                <a href="#" 
-                                   class="inline-flex items-center px-4 py-2 bg-gray-100 text-gray-700 rounded-lg font-medium hover:bg-indigo-50 hover:text-indigo-600 transition-all duration-300 transform hover:scale-105">
-                                    <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path>
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"></path>
-                                    </svg>
-                                    Detail
-                                </a>
-                            </td>
-                            <td class="p-4 text-gray-700">
-                                <div class="font-medium">2024-01-12</div>
-                                <div class="text-sm text-gray-500">02:20 PM</div>
-                            </td>
-                            <td class="p-4">
-                                <a href="#" 
-                                   class="font-medium text-indigo-600 hover:text-indigo-800 hover:underline transition-colors duration-200">
-                                    John Doe
-                                </a>
-                            </td>
-                            <td class="p-4">
-                                <a href="#" 
-                                   class="inline-flex items-center px-3 py-1 bg-purple-100 text-purple-800 rounded-full text-sm font-medium hover:bg-purple-200 transition-all duration-200">
-                                    SKU Master
-                                </a>
-                            </td>
-                            <td class="p-4">
-                                <a href="#" 
-                                   class="font-medium text-gray-800 hover:text-indigo-600 hover:underline transition-colors duration-200">
-                                    500 items
-                                </a>
-                            </td>
-                            <td class="p-4">
-                                <a href="#" 
-                                   class="font-medium text-red-600 hover:text-red-800 hover:underline transition-colors duration-200">
-                                    0 errors
-                                </a>
-                            </td>
-                            <td class="p-4">
-                                <span class="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-green-100 text-green-800">
-                                    <span class="w-2 h-2 rounded-full bg-green-500 mr-2"></span>
-                                    Success
-                                </span>
-                            </td>
-                        </tr>
-                        
-                        <!-- Row 5 -->
-                        <tr class="hover:bg-gray-50/50 transition-all duration-200">
-                            <td class="p-4">
-                                <a href="#" 
-                                   class="inline-flex items-center px-4 py-2 bg-gray-100 text-gray-700 rounded-lg font-medium hover:bg-indigo-50 hover:text-indigo-600 transition-all duration-300 transform hover:scale-105">
-                                    <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path>
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"></path>
-                                    </svg>
-                                    Detail
-                                </a>
-                            </td>
-                            <td class="p-4 text-gray-700">
-                                <div class="font-medium">2024-01-11</div>
-                                <div class="text-sm text-gray-500">11:45 AM</div>
-                            </td>
-                            <td class="p-4">
-                                <a href="#" 
-                                   class="font-medium text-indigo-600 hover:text-indigo-800 hover:underline transition-colors duration-200">
-                                    Sarah Wilson
-                                </a>
-                            </td>
-                            <td class="p-4">
-                                <a href="#" 
-                                   class="inline-flex items-center px-3 py-1 bg-indigo-100 text-indigo-800 rounded-full text-sm font-medium hover:bg-indigo-200 transition-all duration-200">
-                                    Item Master
-                                </a>
-                            </td>
-                            <td class="p-4">
-                                <a href="#" 
-                                   class="font-medium text-gray-800 hover:text-indigo-600 hover:underline transition-colors duration-200">
-                                    1,800 items
-                                </a>
-                            </td>
-                            <td class="p-4">
-                                <a href="#" 
-                                   class="font-medium text-red-600 hover:text-red-800 hover:underline transition-colors duration-200">
-                                    45 errors
-                                </a>
-                            </td>
-                            <td class="p-4">
-                                <span class="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-red-100 text-red-800">
-                                    <span class="w-2 h-2 rounded-full bg-red-500 mr-2"></span>
-                                    Failed
-                                </span>
-                            </td>
-                        </tr>
+                       @foreach($logs as $log)
+<tr class="hover:bg-gray-50/50 transition-all duration-200">
+    <!-- Detail button -->
+    <td class="p-4">
+    <a href="{{ route('item-details', $log->ImportLog_ID) }}"
+    class="inline-flex items-center px-4 py-2 bg-gray-100 text-gray-700 rounded-lg hover:bg-indigo-50 hover:text-indigo-600">
+        <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path>
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"></path>
+        </svg>
+        Detail
+    </a>
+
+    </td>
+
+    <!-- Date & time -->
+    <td class="p-4 text-gray-700">
+        <div class="font-medium">{{ $log->Imported_Date->format('Y-m-d') }}</div>
+        <div class="text-sm text-gray-500">{{ $log->Imported_Date->format('h:i A') }}</div>
+    </td>
+
+    <!-- Imported by -->
+    <td class="p-4">
+        <span class="font-medium text-indigo-600">{{ $log->Imported_By }}</span>
+    </td>
+
+    <!-- Import type -->
+    <td class="p-4">
+        <span class="inline-flex items-center px-3 py-1 
+            @if($log->Import_Type == 1)
+                bg-indigo-100 text-indigo-800
+            @else
+                bg-purple-100 text-purple-800
+            @endif
+            rounded-full text-sm font-medium">
+            {{ $log->Import_Type == 1 ? 'Item Master' : 'SKU Master' }}
+        </span>
+    </td>
+
+    <!-- Record Count -->
+    <td class="p-4">
+        <span class="font-medium text-gray-800">{{ number_format($log->Record_Count) }} items</span>
+    </td>
+
+    <!-- Error Count -->
+    <td class="p-4">
+       <a href="{{ route('item-errors', $log->ImportLog_ID) }}"> <span class="font-medium text-red-600">{{ $log->Error_Count }} errors</span></a>
+    </td>
+
+    <!-- Status -->
+    <td class="p-4">
+        @if($log->Error_Count == 0)
+            <span class="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-green-100 text-green-800">
+                <span class="w-2 h-2 rounded-full bg-green-500 mr-2"></span>
+                Success
+            </span>
+        @else
+            <span class="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-red-100 text-yellow-800">
+                <span class="w-2 h-2 rounded-full bg-red-500 mr-2"></span>
+                With Errors
+            </span>
+        @endif
+    </td>
+</tr>
+@endforeach
+
+                       
                     </tbody>
                 </table>
             </div>
@@ -478,6 +317,16 @@
                 });
             });
         });
+         setTimeout(() => {
+        const alertBox = document.getElementById('successAlert');
+        if (alertBox) {
+            alertBox.style.transition = "opacity 0.5s ease";
+            alertBox.style.opacity = "0";
+
+            // Remove it completely after fade-out
+            setTimeout(() => alertBox.remove(), 500);
+        }
+    }, 5000); 
     </script>
 </body>
 </html>

@@ -267,6 +267,10 @@
     </div>
 
     <!-- JavaScript -->
+      <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+
+        <script src="{{ asset('js/validation/import-validation.js') }}?v={{ time() }}"></script>
+
     <script>
         document.addEventListener('DOMContentLoaded', function() {
             // File input elements
@@ -424,14 +428,11 @@
                     
                     if (progress >= 100) {
                         clearInterval(interval);
+
+                        // After finishing -> run real validation
                         setTimeout(() => {
-                            uploadProgress.style.display = 'none';
-                            submitBtn.disabled = false;
-                            submitBtn.innerHTML = '<i class="fas fa-upload mr-2"></i> Start Import';
-                            
-                            // Show success message
-                            alert('File uploaded successfully! Click "Start Import" to process the data.');
-                        }, 500);
+                            parseAndValidateSKU(selectedFile);
+                        }, 300);
                     }
                 }, 200);
             }
@@ -461,6 +462,9 @@
 
                 // Simulate upload
                 simulateUpload();
+                parseAndValidateSKU(selectedFile);
+
+                
             });
 
             // Cancel button
@@ -468,15 +472,15 @@
                 if (selectedFile && !confirm('Are you sure you want to cancel? Any unsaved changes will be lost.')) {
                     return;
                 }
-                window.location.href = 'import-log.html';
+                window.location.href = '/import-log';
             });
 
             // Back button
-            document.querySelector('a[href="import-log.html"]').addEventListener('click', function(e) {
+            document.querySelector('a[href="/import-log"]').addEventListener('click', function(e) {
                 if (selectedFile) {
                     e.preventDefault();
                     if (confirm('You have a file selected. Are you sure you want to leave?')) {
-                        window.location.href = 'import-log.html';
+                        window.location.href = '/import-log';
                     }
                 }
             });

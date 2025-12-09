@@ -821,7 +821,7 @@ document.querySelectorAll('.price-input').forEach(input => {
         <td class="p-3 border-r">
             <input type="text" class="jan-code w-full p-2 border rounded-lg" value="${skuData.janCode || ''}" placeholder="JAN code" name="skus[stock][]">
         </td>
-        <td class="p-3 border-r">
+        <td class="p-3 border-r" **w-48**">
         <select class="qty-flag **w-full** p-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-all duration-200">
                 <option value="true" ${isQtyFlagTrue  ? 'selected' : ''}>Yes</option>
                 <option value="false" ${!isQtyFlagTrue ? 'selected' : ''}>No</option>

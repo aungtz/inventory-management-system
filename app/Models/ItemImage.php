@@ -13,6 +13,7 @@ class ItemImage extends Model
     protected $fillable = [
         'Item_Code',
         'Image_Name',
+        'Image_Serial',
         'slot',
         'CreatedDate',
         'UpdatedDate',

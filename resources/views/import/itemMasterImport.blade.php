@@ -156,7 +156,7 @@
                         </div>
 
                         <!-- Drag & Drop Area -->
-                        <div class="mb-8">
+                        <!-- <div class="mb-8">
                             <h3 class="text-lg font-semibold text-gray-800 mb-4">Or Drag & Drop File</h3>
                             <div class="drag-drop-area rounded-2xl p-8 text-center cursor-pointer" id="dragDropArea">
                                 <div class="py-8">
@@ -174,7 +174,7 @@
                                     </div>
                                 </div>
                             </div>
-                        </div>
+                        </div> -->
 
                         <!-- Selected File Display -->
                         <div class="mb-8" id="fileDisplay" style="display: none;">
@@ -267,6 +267,10 @@
     </div>
 
     <!-- JavaScript -->
+     <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+
+        <script src="{{ asset('js/validation/import-validation.js') }}?v={{ time() }}"></script>
+
     <script>
         document.addEventListener('DOMContentLoaded', function() {
             // File input elements
@@ -286,16 +290,15 @@
             let selectedFile = null;
 
             // File upload card click handlers
-            document.querySelectorAll('.file-upload-card').forEach(card => {
-                card.addEventListener('click', function() {
-                    const format = this.getAttribute('data-format');
-                    if (format === 'excel') {
-                        excelFileInput.click();
-                    } else if (format === 'csv') {
-                        csvFileInput.click();
-                    }
-                });
-            });
+            // document.querySelectorAll('.file-upload-card').forEach(card => {
+            //         card.addEventListener('click', function(e) {
+            //             e.stopPropagation(); // prevent bubbling
+            //             const format = this.getAttribute('data-format');
+            //             if (format === 'excel') excelFileInput.click();
+            //             else if (format === 'csv') csvFileInput.click();
+            //         });
+            //     });
+
 
             // File upload button click handlers
             document.querySelectorAll('.file-upload button').forEach(button => {
@@ -310,22 +313,20 @@
             });
 
             // Browse button in drag-drop area
-            dragDropArea.querySelector('button').addEventListener('click', function() {
-                dragDropFileInput.click();
-            });
+            // dragDropArea.querySelector('button').addEventListener('click', function() {
+            //     dragDropFileInput.click();
+            // });
 
             // File selection handler
-            function handleFileSelect(file) {
-                if (file) {
-                    selectedFile = file;
-                    fileName.textContent = file.name;
-                    fileSize.textContent = formatFileSize(file.size);
-                    fileDisplay.style.display = 'block';
-                    
-                    // Scroll to file display
-                    fileDisplay.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
-                }
-            }
+          function handleFileSelect(file) {
+            if (!file || selectedFile) return; // prevent multiple triggers
+            selectedFile = file;
+            fileName.textContent = file.name;
+            fileSize.textContent = formatFileSize(file.size);
+            fileDisplay.style.display = 'block';
+            fileDisplay.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+        }
+
 
             // File input change handlers
             excelFileInput.addEventListener('change', function(e) {
@@ -340,11 +341,11 @@
                 }
             });
 
-            dragDropFileInput.addEventListener('change', function(e) {
-                if (this.files.length > 0) {
-                    handleFileSelect(this.files[0]);
-                }
-            });
+            // dragDropFileInput.addEventListener('change', function(e) {
+            //     if (this.files.length > 0) {
+            //         handleFileSelect(this.files[0]);
+            //     }
+            // });
 
             // Remove file button
             removeFileBtn.addEventListener('click', function() {
@@ -352,26 +353,26 @@
                 fileDisplay.style.display = 'none';
                 excelFileInput.value = '';
                 csvFileInput.value = '';
-                dragDropFileInput.value = '';
+               
             });
 
             // Drag and drop functionality
-            ['dragenter', 'dragover', 'dragleave', 'drop'].forEach(eventName => {
-                dragDropArea.addEventListener(eventName, preventDefaults, false);
-            });
+            // ['dragenter', 'dragover', 'dragleave', 'drop'].forEach(eventName => {
+            //     dragDropArea.addEventListener(eventName, preventDefaults, false);
+            // });
 
             function preventDefaults(e) {
                 e.preventDefault();
                 e.stopPropagation();
             }
 
-            ['dragenter', 'dragover'].forEach(eventName => {
-                dragDropArea.addEventListener(eventName, highlight, false);
-            });
+            // ['dragenter', 'dragover'].forEach(eventName => {
+            //     dragDropArea.addEventListener(eventName, highlight, false);
+            // });
 
-            ['dragleave', 'drop'].forEach(eventName => {
-                dragDropArea.addEventListener(eventName, unhighlight, false);
-            });
+            // ['dragleave', 'drop'].forEach(eventName => {
+            //     dragDropArea.addEventListener(eventName, unhighlight, false);
+            // });
 
             function highlight() {
                 dragDropArea.classList.add('dragover');
@@ -381,7 +382,7 @@
                 dragDropArea.classList.remove('dragover');
             }
 
-            dragDropArea.addEventListener('drop', handleDrop, false);
+            // dragDropArea.addEventListener('drop', handleDrop, false);
 
             function handleDrop(e) {
                 const dt = e.dataTransfer;
@@ -415,26 +416,25 @@
                 submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin mr-2"></i> Uploading...';
 
                 let progress = 0;
+
                 const interval = setInterval(() => {
                     progress += Math.random() * 10;
                     if (progress > 100) progress = 100;
-                    
+
                     progressBar.style.width = progress + '%';
                     progressPercent.textContent = Math.round(progress) + '%';
-                    
+
                     if (progress >= 100) {
                         clearInterval(interval);
+
+                        // After finishing -> run real validation
                         setTimeout(() => {
-                            uploadProgress.style.display = 'none';
-                            submitBtn.disabled = false;
-                            submitBtn.innerHTML = '<i class="fas fa-upload mr-2"></i> Start Import';
-                            
-                            // Show success message
-                            alert('File uploaded successfully! Click "Start Import" to process the data.');
-                        }, 500);
+                            parseAndValidate(selectedFile);
+                        }, 300);
                     }
                 }, 200);
             }
+
 
             // Submit button click
             submitBtn.addEventListener('click', function() {
@@ -472,7 +472,7 @@
             });
 
             // Back button
-            document.querySelector('a[href="import-log.html"]').addEventListener('click', function(e) {
+            document.querySelector('a[href="/import-log"]').addEventListener('click', function(e) {
                 if (selectedFile) {
                     e.preventDefault();
                     if (confirm('You have a file selected. Are you sure you want to leave?')) {

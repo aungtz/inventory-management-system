@@ -94,4 +94,16 @@ Route::get('/export-all', [ItemController::class, 'exportAll'])->name('export.al
 Route::get('/import-log', [ImportLogController::class, 'index'])->name('import-log.index');
 Route::get('/sku-master/import', [ImportLogController::class, 'importSkuPage'])->name('sku-master.import');
 Route::get('/item-master/import',[ImportLogController::class,'importItemPage'])->name('item-master.import');
+Route::get('/itemPreview',[ImportLogController::class,'itemPreview'])->name('item-master.preview');
+Route::get('/skuPreview',[ImportLogController::class,'skuPreview'])->name('sku-master.preview');
+Route::get('/import-log/{id}/item-details', [ImportLogController::class, 'itemDetails'])->name('item-details');
+Route::get('/import-log/{id}/sku-details', [ImportLogController::class, 'sku-details'])->name('sku-details');
+
+
+Route::post('/import/process', [ImportLogController::class, 'processImport'])
+    ->name('import.process');
+
+    Route::get('/import/{id}/errors', [ImportLogController::class, 'errorDetails'])
+    ->name('item-errors');
+
 

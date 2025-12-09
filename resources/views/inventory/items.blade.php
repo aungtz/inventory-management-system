@@ -178,9 +178,45 @@
     from { opacity: 0; transform: translateY(-3px); }
     to   { opacity: 1; transform: translateY(0); }
 }
-.input-wrapper {
-    position: relative;   /* IMPORTANT so tooltip positions correctly */
+
+/* Error text below input */
+.error-text {
+    color: #dc2626; /* red-600 */
+    font-size: 0.875rem; /* 14px */
+    margin-top: 0.25rem; /* 4px spacing below input */
+    font-weight: 500;
+    line-height: 1.2;
+    display: block;
+    opacity: 0;
+    transition: opacity 0.2s ease-in-out;
 }
+
+/* When showing error */
+.error-text:not(.hidden) {
+    opacity: 1;
+}
+
+/* Warning icon inside input */
+.error-icon {
+    position: absolute;
+    right: 0.75rem; /* 12px from right */
+    top: 50%;
+    transform: translateY(-50%);
+    font-size: 1rem; /* 16px */
+    color: #dc2626; /* red-600 */
+    pointer-events: none; /* icon is not clickable */
+}
+
+/* Input border colors */
+input.border-red-500 {
+    border-color: #dc2626 !important;
+}
+
+input.border-green-500 {
+    border-color: #16a34a !important; /* green-600 */
+}
+
+
 
 
   </style>
@@ -224,42 +260,58 @@
               <div class="grid grid-cols-3 gap-4 mb-4">
                 <!-- Item Code -->
                <div class="transform transition-all duration-300 hover:scale-[1.02]">
-  <label class="block font-semibold mb-2 text-gray-700 text-sm">Item Code <span class="text-red-500">*</span></label>
-  <input type="text" name="Item_Code" id="Item_Code" required
-         class="input-focus w-full p-3 rounded-xl border border-gray-300 focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-all duration-300 text-sm">
-   <p class="item-code-error text-red-500 text-xs mt-1 hidden"></p>
+            <label class="block font-semibold mb-2 text-gray-700 text-sm">Item Code <span class="text-red-500">*</span></label>
+           <div class="input-wrap">
+            <input type="text" name="Item_Code" id="Item_Code" required
+                  class="input-focus w-full p-3 rounded-xl border border-gray-300 focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-all duration-300 text-sm">
+             <p class="error-text hidden"></p>
 </div>
+              </div>
 
                 <!-- JAN Code -->
                <div class="transform transition-all duration-300 hover:scale-[1.02]">
   <label class="block font-semibold mb-2 text-gray-700 text-sm">JAN Code <span class="text-red-500">*</span></label>
+  <div class="input-wrap">
   <input type="text" name="JanCD" maxlength="13" required
-         class="input-focus w-full p-3 rounded-xl border border-gray-300 focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-all duration-300 text-sm">
+      id="janInput"   class="input-focus w-full p-3 rounded-xl border border-gray-300 focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-all duration-300 text-sm">
+          <p class="error-text hidden" id="janError"></p>
 </div>
+        </div>
 
       <!-- Maker Name -->
       <div class="transform transition-all duration-300 hover:scale-[1.02]">
         <label class="block font-semibold mb-2 text-gray-700 text-sm">Maker Name <span class="text-red-500">*</span></label>
+         <div class="input-wrap">
+
         <input type="text" name="MakerName" required
               class="input-focus w-full p-3 rounded-xl border border-gray-300 focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-all duration-300 text-sm">
-      </div>
+                <p class="error-text hidden"></p>
+            </div>
+            </div>
       </div>
 
       <!-- Item Name -->
       <div class="transform transition-all duration-300 hover:scale-[1.02]">
         <label class="block font-semibold mb-2 text-gray-700 text-sm">Item Name <span class="text-red-500">*</span></label>
+                 <div class="input-wrap">
+
         <textarea name="Item_Name" rows="2" required
             class="input-focus w-full p-3 rounded-xl border border-gray-300 focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-all duration-300 resize-none text-sm"></textarea>
-      </div>
+                <p class="error-text hidden"></p>
+            </div>
+          </div>
       </div>
 
 
             <!-- Memo Right Column -->
             <div class="flex-1 transform transition-all duration-300 hover:scale-[1.01]">
               <label class="block font-semibold mb-2 text-gray-700">Memo</label>
+                <div class="input-wrap">
               <textarea name="Memo" rows="10"
                       class="input-focus w-full p-4 rounded-xl border border-gray-300 focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-all duration-300 resize-y"></textarea>
+                        <p class="error-text hidden"></p>
             </div>
+                    </div>
           </div>
         </div>
 
@@ -271,21 +323,30 @@
             </h3>
 
             <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
-              <div class="transform transition-all duration-300 hover:scale-[1.02]">
+              
+            <div class="transform transition-all duration-300 hover:scale-[1.02]">
         <label class="block font-semibold mb-2 text-gray-700 text-sm">Basic Price <span class="text-red-500">*</span></label>
-        <div class="flex items-center">
+        <div class="flex items-center input-wrap">
+            <div class="input-wrap">
           <input type="text" name="BasicPrice" required placeholder="0" 
                  class="price-input input-focus flex-1 p-3 rounded-xl border border-gray-300 focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-all duration-300 text-sm" />
-          <span class="ml-3 text-gray-600 font-medium text-sm">円</span>
+          <p class="error-text hidden"></p>
+          
         </div>
+                 <!-- <span class="ml-3 text-gray-600 font-medium text-sm">円</span> -->
+          
+          </div>
       </div>
 
                <div class="transform transition-all duration-300 hover:scale-[1.02]">
         <label class="block font-semibold mb-2 text-gray-700 text-sm">List Price <span class="text-red-500">*</span></label>
         <div class="flex items-center">
+          <div class="input-wrap">
           <input type="text" name="ListPrice" required placeholder="0" 
                  class="price-input input-focus flex-1 p-3 rounded-xl border border-gray-300 focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-all duration-300 text-sm" />
-          <span class="ml-3 text-gray-600 font-medium text-sm">円</span>
+          <p class="error-text hidden"></p>
+            </div>
+                 <!-- <span class="ml-3 text-gray-600 font-medium text-sm">円</span> -->
         </div>
       </div>
 
@@ -293,9 +354,12 @@
              <div class="transform transition-all duration-300 hover:scale-[1.02]">
         <label class="block font-semibold mb-2 text-gray-700 text-sm">Cost Price <span class="text-red-500">*</span></label>
         <div class="flex items-center">
+          <div class="input-wrap">
           <input type="text" name="CostPrice" required placeholder="0" 
                  class="price-input input-focus flex-1 p-3 rounded-xl border border-gray-300 focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-all duration-300 text-sm" />
-          <span class="ml-3 text-gray-600 font-medium text-sm">円</span>
+         <p class="error-text hidden"></p>
+            </div>
+                 <!-- <span class="ml-3 text-gray-600 font-medium text-sm">円</span> -->
         </div>
       </div>
             </div>
@@ -412,12 +476,13 @@
              class="px-8 py-3 rounded-xl font-medium transition-all duration-300 bg-white border border-gray-300 text-gray-700 hover:bg-gray-50 hover:border-gray-400 transform hover:scale-105">
             Cancel
           </a>
-          <button type="submit" 
-                  class="btn-success px-8 py-3 rounded-xl text-white font-medium flex items-center gap-2 transition-all duration-300">
+          <button type="submit"   id="submitButton"
+                  class="btn-success px-8 py-3 rounded-xl text-white font-medium flex items-center gap-2 transition-all duration-300 submitBtn">
             <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
             </svg>
-            Save Item
+             <span>Fix Errors to Save</span>
+          
           </button>
         </div>
       </form>
@@ -571,18 +636,14 @@
 //     });
 // }
 
-
-
-// Ensure a global state array exists
+// --- helpers (keep these above) ---
 window.state = window.state || {};
-window.state.productImages = window.state.productImages || []; // index => { file, name, url }
+window.state.productImages = window.state.productImages || [];
 
-// Utility: pad number to 3 digits
 function padSerial(n, width = 3) {
   return String(n).padStart(width, '0');
 }
 
-// Utility: normalize item code / name for filename (remove spaces, lower/upper, keep safe chars)
 function slugifyForFilename(text) {
   if (!text) return 'image';
   return String(text)
@@ -592,13 +653,7 @@ function slugifyForFilename(text) {
     .toLowerCase();
 }
 
-/**
- * options:
- *  - itemCodeSelector (string) e.g. '#Item_Code'
- *  - itemNameSelector (string) e.g. '#Item_Name'
- *  - padWidth (number) e.g. 3
- *  - forceAutoName (bool) if true, user cannot edit name
- */
+// --- Replace setupImageSlot with this version ---
 function setupImageSlot(i, options = {}) {
   const input = document.getElementById(`imageInput${i}`);
   const preview = document.getElementById(`imagePreview${i}`);
@@ -611,102 +666,114 @@ function setupImageSlot(i, options = {}) {
   const padWidth = options.padWidth || 3;
   const forceAutoName = options.forceAutoName ?? false;
 
-  // Ensure slot state exists
+  if (!input || !preview || !nameInput || !btn || !removeBtn) {
+    console.warn('setupImageSlot: missing DOM elements for slot', i);
+    return;
+  }
+
   if (!window.state.productImages[i]) window.state.productImages[i] = null;
 
-  // click proxy
   btn.addEventListener('click', () => input.click());
 
-  // remove / reset
   removeBtn.addEventListener('click', () => {
-    input.value = "";               // reset file input
-    window.state.productImages[i] = null;  // clear state
+    input.value = "";
+    window.state.productImages[i] = null;
     preview.innerHTML = '<div class="text-center">No Image</div>';
     nameInput.value = "";
     nameInput.disabled = !!forceAutoName;
     btn.textContent = "Upload";
+    console.log('slot', i, 'removed, state now:', window.state.productImages);
   });
 
-  // keep name input synced if user types (only if allowed)
   nameInput.addEventListener('input', () => {
     if (!window.state.productImages[i]) window.state.productImages[i] = { file: null, name: '' };
     window.state.productImages[i].name = nameInput.value;
   });
 
-  // When file chosen
   input.addEventListener('change', (e) => {
     const file = e.target.files[0];
     if (!file) return;
 
-    // size constraint example
     if (file.size > 2 * 1024 * 1024) {
       alert('File size must be less than 2MB');
       input.value = '';
       return;
     }
 
-    // Preview
     const reader = new FileReader();
     reader.onload = function(ev) {
       preview.innerHTML = `<img src="${ev.target.result}" class="w-full h-full object-cover rounded-xl" alt="Preview">`;
     };
     reader.readAsDataURL(file);
 
-    // Generate name automatically
-    // 1) read item code or name from DOM if available
-    // AUTO NAME LOGIC
-let base = '';
-const itemCodeEl = document.querySelector(itemCodeSelector);
-const itemNameEl = document.querySelector(itemNameSelector);
+    // --- Build base from Item_Code (preferred) or Item_Name ---
+    let base = '';
+    const itemCodeEl = document.querySelector(itemCodeSelector);
+    const itemNameEl = document.querySelector(itemNameSelector);
+    if (itemCodeEl && itemCodeEl.value) base = itemCodeEl.value;
+    else if (itemNameEl && itemNameEl.value) base = itemNameEl.value;
+    else base = 'item';
 
-if (itemCodeEl && itemCodeEl.value) base = itemCodeEl.value;
-else if (itemNameEl && itemNameEl.value) base = itemNameEl.value;
-else base = 'item';
+    // Display base (keep casing) but sanitize for final name
+    let displayBase = base.trim();
+    if (!displayBase) displayBase = 'item';
 
-// slug but KEEP original case for display
-const slugBaseRaw = base.trim();
-const slugBase = slugifyForFilename(base);  // lowercase, safe.
+    // slug for matching (lowercase, safe)
+    const slugBase = slugifyForFilename(base);
 
-// Collect existing serial numbers
-const existingNumbers = [];
-window.state.productImages.forEach((slot) => {
-    if (!slot || !slot.name) return;
-    const name = slot.name.toString();
+    // --- Collect existing serial numbers ---
+    const existingNumbers = new Set();
 
-    // Match patterns:
-    // Testing001
-    // testing001
-    // testing-001
-    // testing_001
-    const regex = new RegExp(`^${slugBase}[-_]?([0-9]+)$`, "i");
+    // 1) scan current JS state
+    window.state.productImages.forEach((slot, idx) => {
+      if (!slot || !slot.name) return;
+      const nm = slot.name.toString();
+      const m = nm.match(new RegExp(`${slugBase}[-_]?([0-9]{1,})`, 'i'));
+      if (m && m[1]) existingNumbers.add(parseInt(m[1], 10));
+    });
 
-    const match = name.match(regex);
-    if (match && match[1]) {
-        existingNumbers.push(parseInt(match[1], 10));
-    }
-});
+    // 2) scan all name input DOM fields (helps when state isn't fully populated)
+    document.querySelectorAll('input[name^="image_names"]').forEach((el) => {
+      const nm = (el.value || '').toString();
+      if (!nm) return;
+      const m = nm.match(new RegExp(`${slugBase}[-_]?([0-9]{1,})`, 'i'));
+      if (m && m[1]) existingNumbers.add(parseInt(m[1], 10));
+    });
 
-// Next available number
-let serial = 1;
-while (existingNumbers.includes(serial)) serial++;
+    // Debug: show what was found
+    console.log('slot', i, 'base:', displayBase, 'slug:', slugBase, 'existing:', Array.from(existingNumbers));
 
-const generatedName = `${slugBaseRaw}${padSerial(serial, padWidth)}`;
+    // Find smallest available serial
+    let serial = 1;
+    while (existingNumbers.has(serial)) serial++;
 
-// Apply to DOM + state
-nameInput.value = generatedName;
-nameInput.disabled = !!forceAutoName;
+    // Determine extension from original file
+    const extMatch = file.name.match(/(\.[^./\\]+)$/);
+    const extension = extMatch ? extMatch[1].toLowerCase() : '';
 
-window.state.productImages[i] = {
-    file: file,
-    name: generatedName,
-    url: null
-};
-btn.textContent = "Edit";
+    // Final name format: DisplayBase-001.ext  (hyphen between)
+    // sanitize displayBase for final filename: remove unwanted chars but keep casing
+    const displayBaseSanitized = displayBase
+      .trim()
+      .replace(/\s+/g, '-')            // spaces -> hyphen
+      .replace(/[^A-Za-z0-9\-_]/g, ''); // remove other chars
 
+    const finalFilename = `${displayBaseSanitized}-${padSerial(serial, padWidth)}${extension}`;
+
+    // Apply
+    nameInput.value = finalFilename;
+    nameInput.disabled = !!forceAutoName;
+    btn.textContent = 'Edit';
+
+    window.state.productImages[i] = {
+      file: file,
+      name: finalFilename,
+      url: null
+    };
+
+    console.log('slot', i, 'set name ->', finalFilename, 'state now:', window.state.productImages);
   });
 }
-
-
 
 
  function setupSkuModal() {
@@ -863,34 +930,55 @@ row.innerHTML = `
     </button>
   </td>
   <td class="p-3 border-r">
+  <div class="input-wrap">
     <input type="text" class="size-name w-full p-2 border border-gray-300 rounded-lg transition-none" 
            value="${skuData.sizeName || ''}" placeholder="Enter size name">
+           <p class="error-text hidden"></p>
+            </div>
   </td>
   <td class="p-3 border-r">
+  <div class="input-wrap">
     <input type="text" class="color-name w-full p-2 border border-gray-300 rounded-lg transition-none" 
            value="${skuData.colorName || ''}" placeholder="Enter color name">
+           <p class="error-text hidden"></p>
+            </div>
   </td>
   <td class="p-3 border-r">
+  <div class="input-wrap">
     <input type="text" class="size-code w-full p-2 border border-gray-300 rounded-lg transition-none" 
            value="${skuData.sizeCode || ''}" placeholder="Size code">
+           <p class="error-text hidden"></p>
+            </div>
   </td>
   <td class="p-3 border-r">
+  <div class="input-wrap">
     <input type="text" class="color-code w-full p-2 border border-gray-300 rounded-lg transition-none" 
            value="${skuData.colorCode || ''}" placeholder="Color code">
+           <p class="error-text hidden"></p>
+            </div>
   </td>
   <td class="p-3 border-r">
+  <div class="input-wrap">
     <input type="text" class="jan-code w-full p-2 border border-gray-300 rounded-lg transition-none" 
            value="${skuData.janCode || ''}" placeholder="JAN code">
+            <p class="error-text hidden"></p>
+            </div>
   </td>
-  <td class="p-3 border-r">
-    <select class="qty-flag w-full p-2 border border-gray-300 rounded-lg transition-none">
+  <td class="p-3 border-r **w-48**">
+  <div class="input-wrap">
+        <select class="qty-flag **w-full** p-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-all duration-200">
       <option value="true" ${skuData.qtyFlag === 'true' ? 'selected' : ''}>Yes</option>
       <option value="false" ${skuData.qtyFlag === 'false' || !skuData.qtyFlag ? 'selected' : ''}>No</option>
     </select>
+    <p class="error-text hidden"></p>
+            </div>
   </td>
   <td class="p-3">
+  <div class="input-wrap">
     <input type="number" class="stock-quantity text-right w-full p-2 border border-gray-300 rounded-lg transition-none" 
            value="${skuData.stockQuantity || '0'}" placeholder="0" min="0">
+           <p class="error-text hidden"></p>
+            </div>
   </td>
 `;
 

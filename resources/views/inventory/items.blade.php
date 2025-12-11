@@ -453,7 +453,7 @@ input.border-green-500 {
                                 class="btn-primary w-full px-3 py-2 text-sm text-white rounded-lg transition-all duration-300">
                           Upload
                         </button>
-                        <input id="imageInput{{ $i }}" name="images[]" type="file" accept="image/*" class="hidden">
+                        <input id="imageInput{{ $i }}" name="images[]" type="file" accept="image/*" class="hidden" onchange="validateFile(this)">
                       </label>
 
                       <button id="imageRemove{{ $i }}" type="button" 
@@ -803,72 +803,108 @@ function setupImageSlot(i, options = {}) {
     // SAVE BUTTON
     saveSkusBtn.addEventListener('click', () => {
 
-        const newSkus = [];
-        let duplicateFound = false;
-        let janError = false;
+    const newSkus = [];
+    let janError = false;
+    let duplicateFound = false;
 
-        skuModalBody.querySelectorAll('tr').forEach(row => {
+    skuModalBody.querySelectorAll('tr').forEach(row => {
 
-            const sizeName = row.querySelector('.size-name')?.value.trim() || '';
-            const colorName = row.querySelector('.color-name')?.value.trim() || '';
-            const sizeCode = row.querySelector('.size-code')?.value.trim() || '';
-            const colorCode = row.querySelector('.color-code')?.value.trim() || '';
-            const janCodeInput = row.querySelector('.jan-code');
-            const janCode = janCodeInput?.value.trim() || '';
-            const qtyFlag = row.querySelector('.qty-flag')?.value || 'false';
-            const stockQuantity = row.querySelector('.stock-quantity')?.value || '0';
+        const sizeName = row.querySelector('.size-name')?.value.trim() || '';
+        const colorName = row.querySelector('.color-name')?.value.trim() || '';
+        const sizeCode = row.querySelector('.size-code')?.value.trim() || '';
+        const colorCode = row.querySelector('.color-code')?.value.trim() || '';
+        const janCodeInput = row.querySelector('.jan-code');
+        const janCode = janCodeInput?.value.trim() || '';
+        const qtyFlag = row.querySelector('.qty-flag')?.value || 'false';
+        const stockQuantity = row.querySelector('.stock-quantity')?.value || '0';
 
-            // Skip empty entire row
-            if (!sizeName && !colorName && !sizeCode && !colorCode && !janCode) return;
+        // Skip empty entire row
+        if (!sizeName && !colorName && !sizeCode && !colorCode && !janCode) return;
 
-            // ❗ VALIDATE JAN HERE
-            if (!validateSkuJan(janCodeInput)) {
-                janError = true;
-            }
+        // Validate JAN
+        if (!validateSkuJan(janCodeInput)) {
+            janError = true;
+        }
 
-            // Build keys
-            const keyName = `${sizeName}__${colorName}`;
-            const keyCode = `${sizeCode}__${colorCode}`;
+        const keyName = `${sizeName}__${colorName}`;
+        const keyCode = `${sizeCode}__${colorCode}`;
 
-            // Check duplicates
-            if (newSkus.some(s => s.keyName === keyName || s.keyCode === keyCode)) {
-                duplicateFound = true;
-            } else {
-                newSkus.push({
-                    keyName,
-                    keyCode,
-                    sizeName,
-                    colorName,
-                    sizeCode,
-                    colorCode,
-                    janCode,
-                    qtyFlag,
-                    stockQuantity: parseInt(stockQuantity) || 0
-                });
-            }
+        // --- DUPLICATE CHECKS ---
+        let sizeNameDup = newSkus.some(s => s.sizeName === sizeName);
+        let colorNameDup = newSkus.some(s => s.colorName === colorName);
+        let sizeCodeDup = newSkus.some(s => s.sizeCode === sizeCode);
+        let colorCodeDup = newSkus.some(s => s.colorCode === colorCode);
+        let pairNameDup = newSkus.some(s => s.keyName === keyName);
+        let pairCodeDup = newSkus.some(s => s.keyCode === keyCode);
 
+        if (sizeNameDup) {
+            duplicateFound = true;
+            alert(`Size Name "${sizeName}" is duplicate.`);
+            return;
+        }
+
+        if (colorNameDup) {
+            duplicateFound = true;
+            alert(`Color Name "${colorName}" is duplicate.`);
+            return;
+        }
+
+        if (sizeCodeDup) {
+            duplicateFound = true;
+            alert(`Size Code "${sizeCode}" is duplicate.`);
+            return;
+        }
+
+        if (colorCodeDup) {
+            duplicateFound = true;
+            alert(`Color Code "${colorCode}" is duplicate.`);
+            return;
+        }
+
+        if (pairNameDup) {
+            duplicateFound = true;
+            alert(`Combination already exists: ${sizeName} + ${colorName}`);
+            return;
+        }
+
+        if (pairCodeDup) {
+            duplicateFound = true;
+            alert(`Combination already exists: ${sizeCode} + ${colorCode}`);
+            return;
+        }
+
+        // If passed duplicate checks, add it to list
+        newSkus.push({
+            keyName,
+            keyCode,
+            sizeName,
+            colorName,
+            sizeCode,
+            colorCode,
+            janCode,
+            qtyFlag,
+            stockQuantity: parseInt(stockQuantity) || 0
         });
-
-        // ❌ Stop saving if JAN invalid
-        if (janError) {
-            alert("Fix JAN Code before saving.");
-            return;
-        }
-
-        // ❌ Stop saving if duplicates found
-        if (duplicateFound) {
-            alert("Duplicate SKUs found! Size+Color or Code+Code must be unique.");
-            return;
-        }
-
-        // SAVE CLEAN SKUS
-        state.skus = newSkus.map(({ _key, ...sku }) => sku);
-        document.getElementById('skus_json').value = JSON.stringify(state.skus);
-
-        renderSkuTable();
-        skuModal.classList.remove('active');
     });
-}
+
+    // Error Handling
+    if (janError) {
+        alert("Fix JAN Code before saving.");
+        return;
+    }
+
+    if (duplicateFound) {
+        return;
+    }
+
+    // Save SKUs
+    state.skus = newSkus.map(({ _key, ...sku }) => sku);
+    document.getElementById('skus_json').value = JSON.stringify(state.skus);
+
+    renderSkuTable();
+    skuModal.classList.remove('active');
+});
+ }
 
 
 

@@ -809,3 +809,16 @@ function validateSkuJanCodeLength(input) {
     
     return validateJanCDLength(input);
 }
+
+
+function validateFile(input) {
+    const file = input.files[0];
+    if (file) {
+        const allowedExtensions = /(\.jpg|\.jpeg)$/i;
+        if (!allowedExtensions.exec(file.name)) {
+            alert('Only JPG files are allowed!');
+            input.value = '';
+            return false;
+        }
+    }
+}

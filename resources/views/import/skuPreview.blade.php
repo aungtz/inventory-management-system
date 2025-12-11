@@ -3,6 +3,8 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <meta name="csrf-token" content="{{ csrf_token() }}">
+
     <title>Item Import Preview</title>
     <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
@@ -325,6 +327,8 @@
                     </button>
                 </div>
             </div>
+            <input type="hidden" id="importType" value="2">
+
         </div>
 
         <!-- Action Panel -->
@@ -333,7 +337,7 @@
                 <div>
                     <h3 class="font-bold text-gray-800 mb-2">Next Steps</h3>
                     <p class="text-sm text-gray-600">
-                        <span class="text-red-600 font-medium">You have 45 errors that must be fixed before proceeding.</span>
+                        <!-- <span class="text-red-600 font-medium">You have 45 errors that must be fixed before proceeding.</span> -->
                     </p>
                 </div>
                 <div class="flex flex-wrap gap-3">
@@ -398,27 +402,7 @@
             });
             
             // Proceed button
-            const proceedBtn = document.getElementById('proceedBtn');
-            proceedBtn.addEventListener('click', function() {
-                const errorCount = 45; // This would come from actual data
-                
-                if (errorCount > 0) {
-                    if (!confirm(`You still have ${errorCount} errors. Are you sure you want to proceed with the import? Errors will be skipped.`)) {
-                        return;
-                    }
-                }
-                
-                // Show loading state
-                this.innerHTML = '<i class="fas fa-spinner fa-spin mr-2"></i> Processing...';
-                this.disabled = true;
-                
-                // Simulate processing
-                setTimeout(() => {
-                    alert('Import completed successfully! 1,120 items imported, 45 errors skipped.');
-                    this.innerHTML = '<i class="fas fa-check-circle mr-2"></i> Proceed with Import';
-                    this.disabled = false;
-                }, 2000);
-            });
+          
             
             // Download errors button
             // const downloadErrorsBtn = document.getElementById('downloadErrorsBtn');
@@ -584,6 +568,40 @@
         `;
     }).join("");
 });
+    const previewData = JSON.parse(sessionStorage.getItem("skuPreviewData") || "[]");
+
+    const errorRows = previewData.filter(r => r.errors && r.errors.length > 0);
+    const validRows = previewData.filter(r => !r.errors || r.errors.length === 0);
+        document.getElementById("proceedBtn").addEventListener("click", function () {
+
+            
+            const csrfToken = document.querySelector('meta[name="csrf-token"]').getAttribute('content');
+
+            fetch("/import/process", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                    "X-CSRF-TOKEN": csrfToken
+                },
+                body: JSON.stringify({
+                    valid: validRows,
+                    errors: errorRows,
+                    import_type: document.getElementById("importType").value
+
+                
+                })
+            })
+            .then(response => {
+                if (!response.ok) throw new Error("Import failed");
+                window.location.href = "/import-log?success=1";
+            })
+            .catch(err => {
+                console.error("Import Error:", err);
+                alert("Something went wrong during import.");
+            });
+
+        });
+
 
     </script>
 </body>

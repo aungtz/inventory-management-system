@@ -96,14 +96,13 @@ Route::get('/sku-master/import', [ImportLogController::class, 'importSkuPage'])-
 Route::get('/item-master/import',[ImportLogController::class,'importItemPage'])->name('item-master.import');
 Route::get('/itemPreview',[ImportLogController::class,'itemPreview'])->name('item-master.preview');
 Route::get('/skuPreview',[ImportLogController::class,'skuPreview'])->name('sku-master.preview');
-Route::get('/import-log/{id}/item-details', [ImportLogController::class, 'itemDetails'])->name('item-details');
-Route::get('/import-log/{id}/sku-details', [ImportLogController::class, 'sku-details'])->name('sku-details');
-
 
 Route::post('/import/process', [ImportLogController::class, 'processImport'])
     ->name('import.process');
 
-    Route::get('/import/{id}/errors', [ImportLogController::class, 'errorDetails'])
-    ->name('item-errors');
+  
+Route::get('/import-log/{id}/item-details', [ImportLogController::class, 'itemDetails'])->name('item-details');
+Route::get('/import-log/{id}/sku-details', [ImportLogController::class, 'skuDetails'])->name('sku-details');
 
-
+Route::get('/import-log/{id}/item-errors', [ImportLogController::class, 'errorDetails'])->name('item-errors');
+Route::get('/import-log/{id}/sku-errors', [ImportLogController::class, 'skuErrorDetails'])->name('sku-errors');

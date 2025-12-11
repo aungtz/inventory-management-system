@@ -10,6 +10,7 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Storage;
 use Maatwebsite\Excel\Facades\Excel;
 use App\Exports\ItemsAndSkusExport;
+use Illuminate\Support\Facades\Validator;
 
 class ItemController extends Controller
 {
@@ -68,9 +69,7 @@ public function exportAll()
         'Item_Name' => 'required|string|max:255',
         'JanCD'     => 'required|string|max:13',
         'MakerName' => 'required|string|max:255',
-        'BasicPrice' => 'required|numeric|min:0',
         'ListPrice'  => 'required|numeric|min:0',
-        'CostPrice'  => 'required|numeric|min:0',
         'images.*' => 'sometimes|image|mimes:jpeg,png,jpg,gif|max:2048',
     ]);
 
@@ -86,9 +85,7 @@ public function exportAll()
         'JanCD'      => $request->JanCD,
         'MakerName'  => $request->MakerName,
         'Memo'       => $request->Memo,
-        'BasicPrice' => $request->BasicPrice,
         'ListPrice'  => $request->ListPrice,
-        'CostPrice'  => $request->CostPrice,
         'SalePrice'  => $request->SalePrice ?? $request->ListPrice,
         'CreatedBy'  => auth()->user()->name ?? 'system',
         'UpdatedBy'  => auth()->user()->name ?? 'system',
@@ -182,110 +179,221 @@ public function edit($id)
         return view('inventory.itemsEdit', compact('item'));
 
 }
+
+
 public function update(Request $request, $id)
 {
-    // Log request for debugging
     \Log::info('📦 Update Request Data: ' . json_encode($request->all()));
+    
+    // Debug uploaded files
+    $uploadedFiles = $request->file('images', []);
+    \Log::info('📁 Uploaded files count: ' . count($uploadedFiles));
+    
+    foreach ($uploadedFiles as $key => $file) {
+        if ($file) {
+            \Log::info("  File [{$key}]: {$file->getClientOriginalName()}, Size: {$file->getSize()} bytes, Valid: " . ($file->isValid() ? 'yes' : 'no'));
+        }
+    }
 
-    $item = Item::findOrFail($id);
+    try {
+        $item = Item::findOrFail($id);
+        
+        // Log current images in database BEFORE update
+        \Log::info('📊 Current images in database BEFORE update:');
+        $currentImages = ItemImage::where('Item_Code', $item->Item_Code)->get();
+        foreach ($currentImages as $img) {
+            \Log::info("  Slot {$img->slot}: {$img->Image_Name} -> {$img->path}");
+        }
 
-    // Validate item data
-    $validated = $request->validate([
-        'Item_Code' => 'required|string|max:255',
-        'Item_Name' => 'required|string|max:255',
-        'JanCD' => 'required|string|max:13',
-        'MakerName' => 'required|string|max:255',
-        'BasicPrice' => 'required|numeric',
-        'ListPrice' => 'required|numeric',
-        'CostPrice' => 'required|numeric',
-        'Memo' => 'nullable|string',
-        'images.*' => 'image|mimes:jpeg,png,jpg,gif,svg|max:2048'
-    ]);
+        // Validate request - USING CORRECT VALIDATOR
+        $validator = \Validator::make($request->all(), [  // Added backslash
+            'Item_Code' => 'required|string|max:255|unique:M_Item,Item_Code,' . $id . ',Item_Code',
+            'Item_Name' => 'required|string|max:255',
+            'JanCD' => 'required|string|max:13',
+            'MakerName' => 'required|string|max:255',
+            'ListPrice' => 'required|numeric',
+            'Memo' => 'nullable|string',
+            'images.*' => 'nullable|image|mimes:jpeg,png,jpg,gif,svg|max:2048'
+        ]);
 
-    // Update item fields
-    $item->update($validated);
+        if ($validator->fails()) {
+            \Log::error('❌ Validation failed:', $validator->errors()->toArray());
+            
+            if ($request->ajax() || $request->wantsJson()) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Validation failed',
+                    'errors' => $validator->errors()
+                ], 422);
+            }
+            return redirect()->back()->withErrors($validator)->withInput();
+        }
 
-    $imageStates = $request->input('imageStates', []);
-    $imageNames  = $request->input('imageNames', []);
-    $uploadedImages = $request->file('images', []);
+        $validated = $validator->validated();
 
-    foreach ($imageStates as $slot => $state) {
-        $imageName = $imageNames[$slot] ?? null;
+        // Update item
+        $item->update($validated);
 
-        if ($state === 'delete') {
-            // Delete image from DB
-            ItemImage::where('Item_Code', $item->Item_Code)
-                ->where('slot', $slot)
-                ->delete();
-        } elseif ($state === 'new') {
-            if (isset($uploadedImages[$slot])) {
-                $file = $uploadedImages[$slot];
-                $originalName = $file->getClientOriginalName();
-                $path = $file->storeAs('items', $originalName, 'public');
+        $imageStates = $request->input('imageStates', []);
+        $imageNames  = $request->input('imageNames', []);
+        
+        \Log::info('🎯 Image States: ' . json_encode($imageStates));
+        \Log::info('🏷️  Image Names: ' . json_encode($imageNames));
 
-                // Find next available slot dynamically
-                $nextSlot = ItemImage::where('Item_Code', $item->Item_Code)
-                                ->max('slot');
-                $nextSlot = is_null($nextSlot) ? 0 : $nextSlot + 1;
+        foreach ($imageStates as $slot => $state) {
+            $slot = (int)$slot;
+            $imageName = $imageNames[$slot] ?? null;
+            $file = $uploadedFiles[$slot] ?? null;
 
-                ItemImage::create([
-                    'Item_Code' => $item->Item_Code,
-                    'slot' => $nextSlot,
-                    'Image_Name' => $imageName ?? $file->getClientOriginalName(),
-                    'path' => $path
+            \Log::info("🔄 Processing slot {$slot}: state={$state}, imageName={$imageName}, hasFile=" . ($file ? 'yes' : 'no'));
+
+            // Get existing image for this slot
+            $existingImage = ItemImage::where('Item_Code', $item->Item_Code)
+                                      ->where('slot', $slot)
+                                      ->first();
+
+            \Log::info("  Existing image in DB: " . ($existingImage ? "Yes (ID: {$existingImage->id})" : "No"));
+
+            if ($state === 'delete') {
+                if ($existingImage) {
+                    \Log::info("  Deleting image: {$existingImage->path}");
+                    if (!empty($existingImage->path) && \Storage::disk('public')->exists($existingImage->path)) {
+                        \Storage::disk('public')->delete($existingImage->path);
+                        \Log::info("  File deleted from storage");
+                    }
+                    $existingImage->delete();
+                    \Log::info("✅ Deleted image in slot {$slot}");
+                } else {
+                    \Log::info("  No image to delete in slot {$slot}");
+                }
+            } 
+            elseif ($state === 'new') {
+                if ($file && $file->isValid()) {
+                    \Log::info("  Processing new file: {$file->getClientOriginalName()}");
+                    
+                    // Delete old image if exists
+                    if ($existingImage && !empty($existingImage->path)) {
+                        \Log::info("  Deleting old image: {$existingImage->path}");
+                        if (\Storage::disk('public')->exists($existingImage->path)) {
+                            \Storage::disk('public')->delete($existingImage->path);
+                            \Log::info("  Old file deleted from storage");
+                        }
+                    }
+                    // OLD CODE:
+                    // Save new file
+                    $userFileName = $imageName ?: $file->getClientOriginalName();
+                    $uniqueStoredName = time() . '_' . uniqid() . '_' . $userFileName;
+                    $path = $file->storeAs('items', $uniqueStoredName, 'public');
+
+                    // NEW CODE:
+                    // Save new file with original name
+                    $userFileName = $imageName ?: $file->getClientOriginalName();
+                    $path = $file->storeAs('items', $userFileName, 'public');
+                    
+
+ 
+                    
+                    \Log::info("  Saved new file to: {$path}");
+                    \Log::info("  File exists in storage: " . (\Storage::disk('public')->exists($path) ? 'Yes' : 'No'));
+                    
+                    // Create or update
+                    if ($existingImage) {
+                        $existingImage->update([
+                            'Image_Name' => $userFileName,
+                            'path' => $path
+                        ]);
+                        \Log::info("✅ Updated existing record in slot {$slot}");
+                    } else {
+                        ItemImage::create([
+                            'Item_Code' => $item->Item_Code,
+                            'slot' => $slot,
+                            'Image_Name' => $userFileName,
+                            'path' => $path
+                        ]);
+                        \Log::info("✅ Created new record in slot {$slot}");
+                    }
+                } else {
+                    \Log::warning("⚠️ State is 'new' but no valid file for slot {$slot}");
+                    if ($file) {
+                        \Log::warning("  File error: " . ($file->getErrorMessage() ?: 'Unknown error'));
+                    }
+                    
+                    // If state is 'new' but no file, this is an error
+                    if ($request->ajax() || $request->wantsJson()) {
+                        return response()->json([
+                            'success' => false,
+                            'message' => "Image slot {$slot} marked as 'new' but no valid file provided"
+                        ], 400);
+                    }
+                }
+            } 
+            elseif ($state === 'existing') {
+                if ($existingImage) {
+                    \Log::info("  Keeping existing image: {$existingImage->path}");
+                    if ($imageName && $existingImage->Image_Name !== $imageName) {
+                        $existingImage->update(['Image_Name' => $imageName]);
+                        \Log::info("✅ Updated image name in slot {$slot}: {$imageName}");
+                    }
+                }
+            }
+        }
+
+        // Log current images in database AFTER update
+        \Log::info('📊 Current images in database AFTER update:');
+        $updatedImages = ItemImage::where('Item_Code', $item->Item_Code)->get();
+        foreach ($updatedImages as $img) {
+            $exists = !empty($img->path) && \Storage::disk('public')->exists($img->path) ? '✅' : '❌';
+            \Log::info("  {$exists} Slot {$img->slot}: {$img->Image_Name} -> {$img->path}");
+        }
+
+        // Handle SKUs
+        $skus = json_decode($request->input('skus_json', '[]'), true);
+        if ($skus) {
+            $item->skus()->delete();
+            foreach ($skus as $sku) {
+                
+                $item->skus()->create([
+                    'Size_Name'  => $sku['sizeName'] ?? null,
+                    'Color_Name' => $sku['colorName'] ?? null,
+
+                     // 👇 PAD HERE
+    'Size_Code'  => isset($sku['sizeCode']) ? $this->pad4($sku['sizeCode']) : null,
+    'Color_Code' => isset($sku['colorCode']) ? $this->pad4($sku['colorCode']) : null,
+                    'JanCode'    => $sku['janCode'] ?? null,
+                    'Quantity'   => $sku['stockQuantity'] ?? 0
                 ]);
             }
-        } elseif ($state === 'existing') {
-            // Update image name if changed
-            if ($imageName) {
-                ItemImage::where('Item_Code', $item->Item_Code)
-                    ->where('slot', $slot)
-                    ->update(['Image_Name' => $imageName]);
-            }
         }
-    }
 
-    // Handle SKUs
-    $skus = json_decode($request->input('skus_json', '[]'), true);
-    if ($skus) {
-        // Delete old SKUs first
-        $item->skus()->delete();
-
-        foreach ($skus as $sku) {
-            $item->skus()->create([
-                'Size_Name'  => $sku['sizeName'] ?? null,
-                'Color_Name' => $sku['colorName'] ?? null,
-                'Size_Code'  => $sku['sizeCode'] ?? null,
-                'Color_Code' => $sku['colorCode'] ?? null,
-                'JanCode'    => $sku['janCode'] ?? null,
-                'Quantity'   => $sku['stockQuantity'] ?? 0
+        // Return JSON response if it's an AJAX request
+        if ($request->ajax() || $request->wantsJson()) {
+            return response()->json([
+                'success' => true,
+                'message' => 'Item updated successfully',
+                'redirect' => route('items.index')
             ]);
         }
+
+        return redirect()->route('items.index')->with('success', 'Item updated successfully');
+
+    } catch (\Exception $e) {
+        \Log::error('❌ Update error: ' . $e->getMessage());
+        \Log::error($e->getTraceAsString());
+        
+        if ($request->ajax() || $request->wantsJson()) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Server error: ' . $e->getMessage()
+            ], 500);
+        }
+        
+        return redirect()->back()->with('error', 'An error occurred: ' . $e->getMessage());
     }
-
-    return redirect()->route('items.index')->with('success', 'Item updated successfully');
 }
-
-
-
-
-  public function destroy($Item_Code)
+private function pad4($value)
 {
-    // 1) Get item
-    $item = Item::where('Item_Code', $Item_Code)->firstOrFail();
-
-    // 2) Delete SKUs
-    $item->skus()->delete();
-
-    // 3) Delete Images
-    $item->images()->delete();
-
-    // 4) Delete Item
-    $item->delete();
-
-    return back()->with('success', 'Item deleted successfully!');
+    return str_pad((string)$value, 4, '0', STR_PAD_LEFT);
 }
-
 
 
 }

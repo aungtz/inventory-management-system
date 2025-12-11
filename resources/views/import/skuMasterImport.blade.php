@@ -156,26 +156,7 @@
                         </div>
 
                         <!-- Drag & Drop Area -->
-                        <div class="mb-8">
-                            <h3 class="text-lg font-semibold text-gray-800 mb-4">Or Drag & Drop File</h3>
-                            <div class="drag-drop-area rounded-2xl p-8 text-center cursor-pointer" id="dragDropArea">
-                                <div class="py-8">
-                                    <svg class="w-16 h-16 text-gray-400 mx-auto mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12"></path>
-                                    </svg>
-                                    <p class="text-gray-600 font-medium mb-2">Drag and drop your file here</p>
-                                    <p class="text-gray-500 text-sm">Supports Excel (.xlsx, .xls) and CSV (.csv) files up to 50MB</p>
-                                    <div class="mt-4">
-                                        <button type="button" class="px-6 py-2 bg-gray-100 text-gray-700 rounded-xl font-medium hover:bg-gray-200 transition-all duration-300">
-                                            <i class="fas fa-folder-open mr-2"></i>
-                                            Browse Files
-                                        </button>
-                                        <input type="file" id="dragDropFile" accept=".xlsx,.xls,.csv" class="hidden">
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-
+                    
                         <!-- Selected File Display -->
                         <div class="mb-8" id="fileDisplay" style="display: none;">
                             <h3 class="text-lg font-semibold text-gray-800 mb-4">Selected File</h3>
@@ -290,17 +271,7 @@
             let selectedFile = null;
 
             // File upload card click handlers
-            document.querySelectorAll('.file-upload-card').forEach(card => {
-                card.addEventListener('click', function() {
-                    const format = this.getAttribute('data-format');
-                    if (format === 'excel') {
-                        excelFileInput.click();
-                    } else if (format === 'csv') {
-                        csvFileInput.click();
-                    }
-                });
-            });
-
+            
             // File upload button click handlers
             document.querySelectorAll('.file-upload button').forEach(button => {
                 button.addEventListener('click', function(e) {
@@ -314,9 +285,7 @@
             });
 
             // Browse button in drag-drop area
-            dragDropArea.querySelector('button').addEventListener('click', function() {
-                dragDropFileInput.click();
-            });
+            
 
             // File selection handler
             function handleFileSelect(file) {
@@ -344,11 +313,7 @@
                 }
             });
 
-            dragDropFileInput.addEventListener('change', function(e) {
-                if (this.files.length > 0) {
-                    handleFileSelect(this.files[0]);
-                }
-            });
+         
 
             // Remove file button
             removeFileBtn.addEventListener('click', function() {
@@ -356,26 +321,16 @@
                 fileDisplay.style.display = 'none';
                 excelFileInput.value = '';
                 csvFileInput.value = '';
-                dragDropFileInput.value = '';
             });
 
-            // Drag and drop functionality
-            ['dragenter', 'dragover', 'dragleave', 'drop'].forEach(eventName => {
-                dragDropArea.addEventListener(eventName, preventDefaults, false);
-            });
+            
 
             function preventDefaults(e) {
                 e.preventDefault();
                 e.stopPropagation();
             }
 
-            ['dragenter', 'dragover'].forEach(eventName => {
-                dragDropArea.addEventListener(eventName, highlight, false);
-            });
-
-            ['dragleave', 'drop'].forEach(eventName => {
-                dragDropArea.addEventListener(eventName, unhighlight, false);
-            });
+          
 
             function highlight() {
                 dragDropArea.classList.add('dragover');
@@ -385,7 +340,6 @@
                 dragDropArea.classList.remove('dragover');
             }
 
-            dragDropArea.addEventListener('drop', handleDrop, false);
 
             function handleDrop(e) {
                 const dt = e.dataTransfer;

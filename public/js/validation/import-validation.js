@@ -312,15 +312,7 @@ function parseAndValidateSKU(file) {
 
         let message = "";
 
-        if (hasError) {
-            message = "Some SKU rows contain ERRORS.\n\nReview them in the preview page.";
-        } else if (hasWarning) {
-            message = "SKU import contains WARNING rows.\n\nReview them in the preview page.";
-        } else {
-            message = "All SKU rows are valid!\n\nClick OK to continue.";
-        }
-
-        alert(message);
+    
 
         // Redirect to SKU preview page
         window.location.href = '/skuPreview';

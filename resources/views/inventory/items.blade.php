@@ -274,7 +274,7 @@ input.border-green-500 {
   <div class="input-wrap">
   <input type="text" name="JanCD" maxlength="13" required
       id="janInput"   class="input-focus w-full p-3 rounded-xl border border-gray-300 focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-all duration-300 text-sm">
-          <p class="error-text hidden" id="janError"></p>
+             <p class="error-text hidden"></p>
 </div>
         </div>
 
@@ -283,7 +283,7 @@ input.border-green-500 {
         <label class="block font-semibold mb-2 text-gray-700 text-sm">Maker Name <span class="text-red-500">*</span></label>
          <div class="input-wrap">
 
-        <input type="text" name="MakerName" required
+        <input type="text" name="MakerName" required onblur="validateMakerNameLength(this)"
               class="input-focus w-full p-3 rounded-xl border border-gray-300 focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-all duration-300 text-sm">
                 <p class="error-text hidden"></p>
             </div>
@@ -295,7 +295,7 @@ input.border-green-500 {
         <label class="block font-semibold mb-2 text-gray-700 text-sm">Item Name <span class="text-red-500">*</span></label>
                  <div class="input-wrap">
 
-        <textarea name="Item_Name" rows="2" required
+        <textarea name="Item_Name" rows="2" required onblur="validateItemNameLength(this)"
             class="input-focus w-full p-3 rounded-xl border border-gray-300 focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-all duration-300 resize-none text-sm"></textarea>
                 <p class="error-text hidden"></p>
             </div>
@@ -307,7 +307,7 @@ input.border-green-500 {
             <div class="flex-1 transform transition-all duration-300 hover:scale-[1.01]">
               <label class="block font-semibold mb-2 text-gray-700">Memo</label>
                 <div class="input-wrap">
-              <textarea name="Memo" rows="10"
+              <textarea name="Memo" rows="10" onblur="validateMemoLength(this)"
                       class="input-focus w-full p-4 rounded-xl border border-gray-300 focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-all duration-300 resize-y"></textarea>
                         <p class="error-text hidden"></p>
             </div>
@@ -316,55 +316,61 @@ input.border-green-500 {
         </div>
 
         <!-- Pricing Information -->
-        <div class="fade-in">
-          <div class="pricing-card p-6 rounded-2xl border border-gray-200/80 transition-all duration-300">
-            <h3 class="text-xl font-bold mb-6 bg-gradient-to-r from-indigo-600 to-purple-600 bg-clip-text text-transparent">
-              Pricing Information
-            </h3>
+       <div class="fade-in">
+  <div class="pricing-card p-6 rounded-2xl border border-gray-200/80 bg-white shadow-sm">
+    <h3 class="text-xl font-bold mb-6 bg-gradient-to-r from-indigo-600 to-purple-600 bg-clip-text text-transparent">
+      Pricing Information
+    </h3>
 
-            <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
-              
-            <div class="transform transition-all duration-300 hover:scale-[1.02]">
-        <label class="block font-semibold mb-2 text-gray-700 text-sm">Basic Price <span class="text-red-500">*</span></label>
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+      
+      <!-- Basic Price -->
+      <div class="space-y-2">
+        <label class="block font-semibold text-gray-700 text-sm">
+          Sale Price <span class="text-red-500">*</span>
+        </label>
         <div class="flex items-center input-wrap">
-            <div class="input-wrap">
-          <input type="text" name="BasicPrice" required placeholder="0" 
-                 class="price-input input-focus flex-1 p-3 rounded-xl border border-gray-300 focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-all duration-300 text-sm" />
-          <p class="error-text hidden"></p>
-          
-        </div>
-                 <!-- <span class="ml-3 text-gray-600 font-medium text-sm">円</span> -->
-          
+          <div class="relative flex-1">
+            <input 
+              type="text" 
+              name="SalePrice" 
+              required 
+              placeholder="0"
+              class="price-input input-focus w-full p-4 rounded-xl border border-gray-300 focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-all duration-300 text-sm text-right placeholder:text-right"
+            />
+            <p class="error-text hidden text-xs text-red-500 mt-1 text-right"></p>
           </div>
-      </div>
-
-               <div class="transform transition-all duration-300 hover:scale-[1.02]">
-        <label class="block font-semibold mb-2 text-gray-700 text-sm">List Price <span class="text-red-500">*</span></label>
-        <div class="flex items-center">
-          <div class="input-wrap">
-          <input type="text" name="ListPrice" required placeholder="0" 
-                 class="price-input input-focus flex-1 p-3 rounded-xl border border-gray-300 focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-all duration-300 text-sm" />
-          <p class="error-text hidden"></p>
-            </div>
-                 <!-- <span class="ml-3 text-gray-600 font-medium text-sm">円</span> -->
+          <span class="ml-3 text-gray-600 font-medium whitespace-nowrap">
+            円
+          </span>
         </div>
       </div>
 
-
-             <div class="transform transition-all duration-300 hover:scale-[1.02]">
-        <label class="block font-semibold mb-2 text-gray-700 text-sm">Cost Price <span class="text-red-500">*</span></label>
-        <div class="flex items-center">
-          <div class="input-wrap">
-          <input type="text" name="CostPrice" required placeholder="0" 
-                 class="price-input input-focus flex-1 p-3 rounded-xl border border-gray-300 focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-all duration-300 text-sm" />
-         <p class="error-text hidden"></p>
-            </div>
-                 <!-- <span class="ml-3 text-gray-600 font-medium text-sm">円</span> -->
-        </div>
-      </div>
-            </div>
+      <!-- List Price -->
+      <div class="space-y-2">
+        <label class="block font-semibold text-gray-700 text-sm">
+          List Price <span class="text-red-500">*</span>
+        </label>
+        <div class="flex items-center input-wrap">
+          <div class="relative flex-1">
+            <input 
+              type="text" 
+              name="ListPrice" 
+              required 
+              placeholder="0"
+              class="price-input input-focus w-full p-4 rounded-xl border border-gray-300 focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-all duration-300 text-sm text-right placeholder:text-right"
+            />
+            <p class="error-text hidden text-xs text-red-500 mt-1 text-right"></p>
           </div>
+          <span class="ml-3 text-gray-600 font-medium whitespace-nowrap">
+            円
+          </span>
         </div>
+      </div>
+      
+    </div>
+  </div>
+</div>
 
         <!-- SKU Section -->
         <div class="fade-in">
@@ -481,7 +487,7 @@ input.border-green-500 {
             <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
             </svg>
-             <span>Fix Errors to Save</span>
+             <span>Insert Items</span>
           
           </button>
         </div>

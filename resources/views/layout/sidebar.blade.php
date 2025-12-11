@@ -29,18 +29,18 @@
       <span>Dashboard</span>
     </a>
 
-    <a href="/items" class="flex items-center space-x-3 p-3 rounded-lg bg-blue-500/20 text-blue-400 border border-blue-500/30">
+    <a href="/items" class="flex items-center space-x-3 p-3 rounded-lg hover:bg-slate-700/50 transition-colors text-slate-300 hover:text-white">
       <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4" />
       </svg>
       <span>Items</span>
     </a>
 
-     <a href="/items/create" class="flex items-center space-x-3 p-3 rounded-lg bg-blue-500/20 text-blue-400 border border-blue-500/30">
+     <a href="/items/create" class="flex items-center space-x-3 p-3 rounded-lg hover:bg-slate-700/50 transition-colors text-slate-300 hover:text-white">
         <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
           <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
         </svg>
-      <span>Crate Items</span>
+      <span>Create Items</span>
     </a>
 
 

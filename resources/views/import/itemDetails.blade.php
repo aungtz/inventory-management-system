@@ -58,8 +58,8 @@
                     <p class="text-lg font-semibold">{{ $items->count() }}</p>
                     </div>
                     <div>
-                        <p class="text-sm text-gray-600">Import Status</p>
-                        <p class="text-lg font-semibold text-green-600">{{ $log->Import_Status }}</p>
+                        <p class="text-sm text-gray-600">Import Type</p>
+                        <p class="text-lg font-semibold text-green-600">{{ $log->Import_Type }}</p>
 
                     </div>
                     <div>
@@ -68,7 +68,7 @@
 
                     </div>
                     <div>
-                        <p class="text-sm text-gray-600">File Name</p>
+                        <!-- <p class="text-sm text-gray-600">File Name</p> -->
                         <p class="text-lg font-semibold">{{ $log->File_Name }}</p>
 
                     </div>
@@ -86,7 +86,6 @@
                 <table class="w-full">
                     <thead class="bg-gray-100 sticky-header">
                         <tr>
-                             <th class="p-3 text-left font-medium text-gray-700">Status</th>
                             <th class="p-3 text-left font-medium text-gray-700">Item_Code</th>
                             <th class="p-3 text-left font-medium text-gray-700">Item_Name</th>
                             <th class="p-3 text-left font-medium text-gray-700">JanCD</th>
@@ -100,10 +99,7 @@
 <tr class="hover:bg-gray-50">
     
     {{-- Status column --}}
-    <td class="p-3 font-semibold 
-        {{ $item->Status == 'Valid' ? 'text-green-600' : 'text-red-600' }}">
-        {{ $item->Status }}
-    </td>
+  
 
     <td class="p-3">{{ $item->Item_Code }}</td>
     <td class="p-3">{{ $item->Item_Name }}</td>

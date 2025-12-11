@@ -13,7 +13,7 @@ class Item extends Model
 
 protected $fillable = [
     'Item_Code', 'Item_Name', 'JanCD', 'MakerName', 'Memo',
-    'BasicPrice', 'ListPrice', 'CostPrice', 'SalePrice',
+     'ListPrice',  'SalePrice',
     'CreatedBy', 'UpdatedBy'
 ];
 

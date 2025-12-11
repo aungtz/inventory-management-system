@@ -8,35 +8,102 @@ function showInputError(input, message, { autoHide = true, duration = 5000 } = {
     const errorText = wrapper.querySelector(".error-text");
     if (!errorText) return;
 
-    // Remove any old icon
-    wrapper.querySelectorAll(".error-icon").forEach(i => i.remove());
-
-    // Insert warning icon inside input
+    // --- Cleanup function (defined here for access to local variables) ---
+    const cleanupOnFocus = () => {
+        // We use the same cleanup logic as setValid below, but add the listener removal.
+        errorText.classList.add("hidden");
+        wrapper.querySelectorAll(".error-icon").forEach(i => i.remove());
+        input.classList.remove("border-red-500");
+        input.classList.add("border-gray-300");
+        
+        // Remove the focus listener
+        input.removeEventListener('focus', cleanupOnFocus);
+        
+        // Clear the stored reference
+        delete input.cleanupListener; 
+    };
+    // ---------------------------------------------
     
+    // Store the listener reference on the input so setValid can remove it later
+    input.cleanupListener = cleanupOnFocus; 
+
+    // Remove any old icon before setting a new one
+    wrapper.querySelectorAll(".error-icon").forEach(i => i.remove());
 
     // Red border
     input.classList.remove("border-green-500");
+    input.classList.remove("border-gray-300"); 
     input.classList.add("border-red-500");
 
     // Show error message
     errorText.textContent = message;
     errorText.classList.remove("hidden");
+    
+    // Add the focus listener
+    input.addEventListener('focus', cleanupOnFocus);
+
 
     // Auto-hide after duration
     if (autoHide) {
         setTimeout(() => {
-            errorText.classList.add("hidden");
-            wrapper.querySelectorAll(".error-icon").forEach(i => i.remove());
-            input.classList.remove("border-red-500");
+            // Only clean up if the error is still active
+            if (input.classList.contains("border-red-500")) {
+                cleanupOnFocus();
+            }
         }, duration);
     }
 }
 
-
-
 function setValid(input) {
+    const wrapper = input.closest(".input-wrap");
+    if (!wrapper) return;
+    
+    const errorText = wrapper.querySelector(".error-text");
+
+    // 1. Remove the error message and icons IMMEDIATELY
+    if (errorText) {
+        errorText.classList.add("hidden");
+    }
+    wrapper.querySelectorAll(".error-icon").forEach(i => i.remove());
+
+    // 2. Remove the focus listener if it exists
+    if (input.cleanupListener) {
+        // Remove the listener using the stored reference
+        input.removeEventListener('focus', input.cleanupListener);
+        // Clean up the stored reference
+        delete input.cleanupListener; 
+    }
+    
+    // 3. Set the valid border color
     input.classList.remove('border-red-500');
+    input.classList.remove('border-gray-300'); // Ensure default border is removed
     input.classList.add('border-green-500');
+}
+
+/**
+ * Global function to remove the error state (message, icons, border, and listeners) 
+ * from a given input field.
+ */
+function clearErrorState(input) {
+    const wrapper = input.closest(".input-wrap");
+    if (!wrapper) return;
+
+    const errorText = wrapper.querySelector(".error-text");
+    if (errorText) {
+        errorText.classList.add("hidden");
+    }
+
+    wrapper.querySelectorAll(".error-icon").forEach(i => i.remove());
+    
+    input.classList.remove("border-red-500");
+    input.classList.add("border-gray-300"); // Add back a default border if needed
+
+    // CRUCIAL: Remove the listener used for immediate cleanup on focus.
+    // We need to pass a reference to the function used to attach it. 
+    // Since we can't easily reference the 'cleanupError' function used previously,
+    // we need to slightly restructure the logic in showInputError.
+    
+    // For simplicity and direct control, we'll rely on setValid to override everything.
 }
 
 function setInvalid(input) {
@@ -53,44 +120,65 @@ function validateRequiredText(input, maxLength = 100) {
         return false;
     }
 
-    if (val.length > maxLength) {
-        input.value = val.substring(0, maxLength);
-        setInvalid(input);
-        showInputError(input,`Max ${maxLength} characters allowed`);
-        return false;
-    }
+    // if (val.length > maxLength) {
+    //     input.value = val.substring(0, maxLength);
+    //     setInvalid(input);
+    //     showInputError(input,`Max ${maxLength} characters allowed`);
+    //     return false;
+    // }
+    
+
 
     setValid(input);
     return true;
 }
-
 function validateItemCode(input) {
-    let cleaned = input.value.replace(/\s+/g, '');
+    // 1. Define the Regular Expression (No change here, it's correct)
+    const forbiddenCharsRegex = /[\s&*^$#@%\u3000-\u30FF\u4E00-\u9FFF\uFF00-\uFFEF]/g;
 
-    // Remove spaces
-    if (cleaned !== input.value) {
-        input.value = cleaned;
-        setInvalid(input);
-        showInputError(input, "Spaces are not allowed in Item Code");
-        return false;
+    const originalValue = input.value; 
+
+    // 2. Create the 'cleaned' value.
+    let cleaned = originalValue.replace(forbiddenCharsRegex, '');
+    
+    // 3. Check for change and update input.
+    if (cleaned !== originalValue) {
+        input.value = cleaned; 
+        
+        // --- START OF ERROR MESSAGE FIX ---
+        
+        // A. If the input is empty AFTER cleaning (all input was forbidden chars):
+        if (cleaned.length === 0) {
+            setInvalid(input);
+            // Give a specific error for why the field is now empty.
+            showInputError(input, "All characters were removed. Item Code is required.");
+            return false;
+        }
+        
+        // B. If the input is NOT empty AFTER cleaning (some forbidden chars were removed, but some valid chars remain):
+        setInvalid(input); // Use invalid state temporarily for the warning
+        showInputError(input, "Invalid characters (spaces, Japanese, $, #, @, %) were removed.");
+        
+        // NOTE: We don't return false here, as the input field is now considered valid, 
+        // but we show the error message to notify the user.
     }
 
-    // ❌ Detect Japanese text (Hiragana, Katakana, Kanji, fullwidth symbols)
-    const jpRegex = /[\u3000-\u30FF\u4E00-\u9FFF\uFF00-\uFFEF]/;
-
-    if (jpRegex.test(cleaned)) {
-        setInvalid(input);
-        showInputError(input, "Japanese characters are not allowed");
-        return false;
-    }
-
-    // ❌ Empty check
-    if (cleaned.length === 0) {
+    // 4. Final Empty check on the cleaned value (This only runs if no invalid characters were present, OR 
+    //    if the previous block ran but didn't return false).
+    
+    // ❌ Empty check (Only runs if the field was empty to begin with, or the cleaning didn't happen)
+    if (cleaned.length === 0 && cleaned === originalValue) {
         setInvalid(input);
         showInputError(input, "Item Code is required");
         return false;
     }
 
+    // IMPORTANT: The validateItemCodeLength function handles setting setValid/setInvalid
+    // and showing the length error message. If it returns false, we stop here.
+  if (!validateItemCodeLength(input)) {
+        return false;
+    }
+    
     // ✔ Valid
     setValid(input);
     return true;
@@ -122,10 +210,13 @@ function validateMemo(input) {
         return false;
     }
 
-    if (val.length > 200) {
-        input.value = val.substring(0, 200);
-        setInvalid(input);
-        showInputError(input,"Memo cannot exceed 200 characters");
+    // if (val.length > 200) {
+    //     input.value = val.substring(0, 200);
+    //     setInvalid(input);
+    //     showInputError(input,"Memo cannot exceed 200 characters");
+    //     return false;
+    // }
+    if (!validateMemoLength(input)) {
         return false;
     }
 
@@ -283,60 +374,11 @@ function validateMemo(input) {
             showInputError(input, 'Unknown validation error');
             return { ok: false, reason: 'unknown', raw };
         }
-  const handleInput = () => {
-            // Validate in "live typing" mode using the requested wrapper function
-            const result = validateJanCode(janInput);
 
-            // Get the span element inside the button to update its text content
-            const buttonTextSpan = submitButton.querySelector('span');
 
-            // Update submit button state
-            if (result.ok) {
-                // Valid (exactly 13 digits, no leading zero)
-                submitButton.disabled = false;
-                buttonTextSpan.textContent = 'Save Item'; 
-                setValid(janInput);
-            } else {
-                // Invalid or Incomplete
-                submitButton.disabled = true;
-                
-                // Show a more specific message on the button if it's just incomplete
-                if (result.reason === 'incomplete') {
-                    buttonTextSpan.textContent = `Requires ${13 - result.raw.length} more digits in Jancd`;
-                } else {
-                    buttonTextSpan.textContent = 'Fix Errors to Save'; // Generic error message
-                }
-                setInvalid(janInput);
-            }
-        };
 
-        /**
-         * Event listener for form submission to handle final validation (enforceExact13: true).
-         */
-        const handleSubmit = (event) => {
-            event.preventDefault();
-            
-            // Re-validate in strict mode (enforceExact13: true) using the generic function
-            const finalResult = validateJanGeneric(janInput, { enforceExact13: true });
 
-            // if (finalResult.ok) {
-            //     alert(`SUCCESS! Valid JAN code submitted: ${finalResult.raw}`);
-            //     // In a real application, you would make an API call here.
-            // } else {
-            //     // This shouldn't be reachable if the button is disabled correctly, 
-            //     // but handles edge cases like manual form submission.
-            //     console.error('Submission blocked. Reason:', finalResult.reason);
-            //     showInputError(janInput, `Submission failed: ${finalResult.reason}. Fix the input.`);
-            // }
-        };
-
-        // --- Setup Event Listeners ---
-        janInput.addEventListener('input', handleInput);
-        document.getElementById('itemForm').addEventListener('submit', handleSubmit);
         
-        // Initial run to set button state (if the field loads with pre-filled data)
-        handleInput();
-
 
 // wrappers for existing names (keeps your code compatible)
 function validateJanCode(input) {
@@ -366,10 +408,10 @@ function validatePrice(input,maxDigits) {
     setValid(input);
     return true;
 }
-function validateSkuDigits(input) {
-    let val = input.value.replace(/\D/g, '');
-    input.value = val;
 
+function validateSkuDigits(input) {
+    let val = input.value.replace(/,/g, '').replace(/\D/g, '');
+    
     // --- STOCK FIELD SPECIAL RULE ---
     const isStock = input.classList.contains("stock-quantity");
 
@@ -387,11 +429,15 @@ function validateSkuDigits(input) {
                     showInputError(input,"cannot be empty")
 
         } else {
+                 
+
             showInputError(input, "Digits only — cannot be empty");
         }
 
         return false;
     }
+
+    
 
     // Valid
     setValid(input);
@@ -450,6 +496,7 @@ function validateSkuRow(row) {
     if (!sizeName.value.trim()) {
         setInvalid(sizeName);
         showInputError(input,'Size Name is required.');
+        validateItemNameLength(input)
     } else setValid(sizeName);
 
     // Color Name
@@ -487,10 +534,17 @@ function validateSkuRow(row) {
 document.addEventListener('DOMContentLoaded', () => {
     const itemCode = document.querySelector('input[name="Item_Code"]');
     const janCode = document.querySelector('input[name="JanCD"]');
-    const requiredText = document.querySelectorAll('input[name="MakerName"], textarea[name="Item_Name"]');
-    const priceInputs = document.querySelectorAll('input[name="BasicPrice"], input[name="ListPrice"], input[name="CostPrice"]');
+    
+    // 1. Separate variables for MakerName and Item_Name
+    const makerNameInput = document.querySelector('input[name="MakerName"]');
+    const itemNameInput = document.querySelector('textarea[name="Item_Name"]');
+    
+    const priceInputs = document.querySelectorAll('input[name="SalePrice"], input[name="ListPrice"], input[name="CostPrice"]');
     const memoInput = document.querySelector('textarea[name="Memo"]');
 
+    // =========================================================================
+    // ITEM CODE LISTENERS (No change needed here)
+    // =========================================================================
     // Prevent typing spaces entirely
     itemCode.addEventListener('keydown', (e) => {
         if (e.key === ' ') e.preventDefault();
@@ -509,26 +563,48 @@ document.addEventListener('DOMContentLoaded', () => {
         validateItemCode(itemCode);
     });
 
-    janCode.addEventListener('input', () => validateJanCode(janCode));
+    // =========================================================================
+    // JAN CODE LISTENERS (No change needed here)
+    // =========================================================================
+    // Note: Assuming validateJanCode now calls validateJanCDLength
+    janCode.addEventListener('input', () => validateJanCode(janCode)); 
     janCode.addEventListener('blur', () => validateJanCode(janCode));
 
-    requiredText.forEach(input => {
-        input.addEventListener('input', () => validateRequiredText(input));
-        input.addEventListener('blur', () => validateRequiredText(input));
-    });
-    memoInput.addEventListener('input',()=> validateMemo(memoInput));
+    // =========================================================================
+    // REQUIRED TEXT LISTENERS (Replaced the generic loop)
+    // =========================================================================
+    
+    // 2. Maker Name Listeners (Calls its specific length/required function)
+    makerNameInput.addEventListener('input', () => validateMakerNameLength(makerNameInput));
+    makerNameInput.addEventListener('blur', () => validateMakerNameLength(makerNameInput));
+    
+    // 3. Item Name Listeners (Calls its specific length/required function)
+    itemNameInput.addEventListener('input', () => validateItemNameLength(itemNameInput));
+    itemNameInput.addEventListener('blur', () => validateItemNameLength(itemNameInput));
+    
+    // =========================================================================
+    // MEMO LISTENERS (No change needed here)
+    // =========================================================================
+    // Note: Assuming validateMemo now calls validateMemoLength
+    memoInput.addEventListener('input',()=> validateMemo(memoInput)); 
     memoInput.addEventListener('blur', () => validateMemo(memoInput));
 
 
+    // =========================================================================
+    // PRICE LISTENERS (No change needed here)
+    // =========================================================================
     priceInputs.forEach(input => {
         input.addEventListener('input', () => validatePrice(input, 9));
         input.addEventListener('blur', () => validatePrice(input, 9));
     });
 
-    // SKU live validation
+    // =========================================================================
+    // SKU LISTENERS (No change needed here)
+    // =========================================================================
     document.querySelectorAll('.sku-row').forEach(row => {
         row.querySelectorAll('input').forEach(input => {
-            input.addEventListener('input', () => validateSkuRow(row));
+            // NOTE: validateSkuRow should internally call the specific length/digit validators
+            input.addEventListener('input', () => validateSkuRow(row)); 
             input.addEventListener('blur', () => validateSkuRow(row));
         });
     });
@@ -540,14 +616,30 @@ document.addEventListener('DOMContentLoaded', () => {
 // SKU Row Attach Validation
 // --------------------
 function attachSkuRowValidation(row) {
-   row.querySelectorAll('.size-name, .color-name').forEach(input => {
-    // Validate as required text
-    input.addEventListener('input', () => validateRequiredText(input));
-    input.addEventListener('blur', () => validateRequiredText(input));
-});
+// --- 1. Size Name Validation (NVARCHAR(100) / 200 bytes) ---
+    row.querySelectorAll('.size-name').forEach(input => {
+        // Calls the correct function: validateSizeNameLength
+        input.addEventListener('input', () => validateSizeNameLength(input));
+        input.addEventListener('blur', () => validateSizeNameLength(input));
+    });
 
-    row.querySelectorAll('.size-code, .color-code, .stock-quantity').forEach(n => {
-        n.addEventListener('input', () => validateSkuDigits(n));
+    // --- 2. Color Name Validation (NVARCHAR(100) / 200 bytes) ---
+    row.querySelectorAll('.color-name').forEach(input => {
+        // Calls the correct function: validateColorNameLength
+        input.addEventListener('input', () => validateColorNameLength(input));
+        input.addEventListener('blur', () => validateColorNameLength(input));
+    });
+row.querySelectorAll('.size-code').forEach(input => {
+        // Calls the correct function: validateSizeCodeLength
+        input.addEventListener('input', () => validateSizeCodeLength(input));
+        input.addEventListener('blur', () => validateSizeCodeLength(input));
+    });
+
+    // --- 4. Color Code Validation (CHAR(4) / 4 bytes) ---
+    row.querySelectorAll('.color-code').forEach(input => {
+        // Calls the correct function: validateColorCodeLength
+        input.addEventListener('input', () => validateColorCodeLength(input));
+        input.addEventListener('blur', () => validateColorCodeLength(input));
     });
 
     
@@ -574,3 +666,146 @@ document.getElementById('saveSkusBtn').addEventListener('click', () => {
     sanitizeAllSkuFields();
     // closeSkuModal();
 });
+
+
+
+// length validation
+
+/**
+ * Calculates the byte length of a string.
+ * Assumes 1 byte for ASCII (0x0000 - 0x007F) and 2 bytes for other common CJK/Unicode characters.
+ * @param {string} str - The string to measure.
+ * @returns {number} The calculated byte length.
+ */
+function getStringByteLength(str) {
+    if (!str) return 0;
+    let byteLength = 0;
+    for (let i = 0; i < str.length; i++) {
+        const charCode = str.charCodeAt(i);
+        // ASCII characters (0-127) are 1 byte
+        if (charCode >= 0x0000 && charCode <= 0x007F) {
+            byteLength += 1;
+        } else {
+            // Assume other characters (including Japanese) are 2 bytes
+            byteLength += 2;
+        }
+    }
+    return byteLength;
+}
+
+/**
+ * Validates the input against max byte length and required status.
+ * @param {HTMLInputElement} input - The input element.
+ * @param {number} maxBytes - The maximum allowed byte length.
+ * @param {string} name - The display name of the field.
+ * @param {boolean} isRequired - Whether the field must not be empty.
+ * @returns {boolean} True if valid, false otherwise.
+ */
+function validateByteLength(input, maxBytes, name, isRequired = true) {
+    let value = input.value;
+    
+    // --- Empty Check ---
+    if (isRequired && value.length === 0) {
+        setInvalid(input);
+        showInputError(input, `${name} is required.`);
+        return false;
+    }
+
+    // --- Byte Length Check ---
+    let currentBytes = getStringByteLength(value);
+
+    if (currentBytes > maxBytes) {
+        // Truncate the value to fit the max byte limit
+        let truncatedValue = '';
+        let currentTruncatedBytes = 0;
+
+        for (let i = 0; i < value.length; i++) {
+            const char = value.charAt(i);
+            const charCode = value.charCodeAt(i);
+            const charBytes = (charCode >= 0x0000 && charCode <= 0x007F) ? 1 : 2;
+
+            if (currentTruncatedBytes + charBytes <= maxBytes) {
+                currentTruncatedBytes += charBytes;
+                truncatedValue += char;
+            } else {
+                break;
+            }
+        }
+        
+        input.value = truncatedValue;
+
+        setInvalid(input);
+        showInputError(input, `${name} exceeds the limit of ${maxBytes} bytes.`);
+        return false;
+    }
+    
+    // Final check for valid state
+    setValid(input);
+    return true;
+}
+
+function validateItemCodeLength(input) {
+    // NVARCHAR(50) = 100 bytes
+    return validateByteLength(input, 100, "Item Code", true); 
+    console.log("length is working")
+}
+
+function validateItemNameLength(input) {
+    // NVARCHAR(100) = 200 bytes
+    if (!validateRequiredText(input)) {
+        return false;
+    }
+    return validateByteLength(input, 200, "Item Name", true);
+}
+
+
+function validateMakerNameLength(input) {
+    // NVARCHAR(50) = 100 bytes
+    if (!validateRequiredText(input)) {
+        return false;
+    }
+    return validateByteLength(input, 100, "Maker Name", false); // Assuming not required
+}
+
+    function validateMemoLength(input) {
+        // NVARCHAR(255) = 510 bytes
+        return validateByteLength(input, 510, "Memo", false); // Assuming not required
+    }
+
+function validateSizeCodeLength(input) {
+    // CHAR(4) = 4 bytes
+    if (!validateSkuDigits(input)) {
+        return false;
+    }
+    return validateByteLength(input, 4, "Size Code", true); 
+}
+
+function validateColorCodeLength(input) {
+    // CHAR(4) = 4 bytes
+    if (!validateSkuDigits(input)) {
+        return false;
+    }
+    return validateByteLength(input, 4, "Color Code", true); 
+}
+
+function validateSizeNameLength(input) {
+    // NVARCHAR(100) = 200 bytes
+
+    if (!validateRequiredText(input)) {
+        return false;
+    }
+    return validateByteLength(input, 200, "Size Name", false); // Assuming not required
+}
+
+function validateColorNameLength(input) {
+    // NVARCHAR(100) = 200 bytes
+     if (!validateRequiredText(input)) {
+        return false;
+    }
+    return validateByteLength(input, 200, "Color Name", false); // Assuming not required
+}
+
+function validateSkuJanCodeLength(input) {
+    
+    return validateJanCDLength(input);
+}

@@ -81,10 +81,7 @@
       transition: all 0.2s ease-in-out;
     }
 
-    .sku-row:hover {
-      background-color: rgba(249, 250, 251, 0.8);
-      transform: translateX(4px);
-    }
+   
 
     .btn-primary {
       background: linear-gradient(135deg, #4f46e5 0%, #7c3aed 100%);
@@ -182,6 +179,24 @@
     position: relative;   /* IMPORTANT so tooltip positions correctly */
 }
 
+
+/* Error text below input */
+.error-text {
+    color: #dc2626; /* red-600 */
+    font-size: 0.875rem; /* 14px */
+    margin-top: 0.25rem; /* 4px spacing below input */
+    font-weight: 500;
+    line-height: 1.2;
+    display: block;
+    opacity: 0;
+    transition: opacity 0.2s ease-in-out;
+}
+
+/* When showing error */
+.error-text:not(.hidden) {
+    opacity: 1;
+}
+ 
   </style>
 </head>
 
@@ -227,83 +242,121 @@
                 <!-- Item Code -->
                 <div class="transform transition-all duration-300 hover:scale-[1.02]">
                   <label class="block font-semibold mb-2 text-gray-700">Item Code <span class="text-red-500">*</span></label>
+                          <div class="input-wrap">
+
                   <input type="text" name="Item_Code" required   id="Item_Code"    value="{{ $item->Item_Code }}" readonly 
 
                          class="input-focus w-full p-3 rounded-xl border border-gray-300 focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-all duration-300">
                    <!-- <p class="item-code-error text-red-500 text-sm mt-1 hidden"></p> -->
-
+           <p class="error-text hidden"></p>
+                  </div>
                         </div>
 
                 <!-- JAN Code -->
                 <div class="transform transition-all duration-300 hover:scale-[1.02]">
                   <label class="block font-semibold mb-2 text-gray-700">JAN Code <span class="text-red-500">*</span></label>
+                           <div class="input-wrap">
+
                   <input type="text" name="JanCD" maxlength="13" required        value="{{ $item->JanCD }}"
 
                          class="input-focus w-full p-3 rounded-xl border border-gray-300 focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-all duration-300">
-                </div>
+                   <p class="error-text hidden"></p>
+                        </div>
+                        </div>
 
                 <!-- Maker Name -->
                 <div class="transform transition-all duration-300 hover:scale-[1.02]">
                   <label class="block font-semibold mb-2 text-gray-700">Maker Name <span class="text-red-500">*</span></label>
+                         <div class="input-wrap">
+
                   <input type="text" name="MakerName" required value="{{ $item->MakerName }}"
                          class="input-focus w-full p-3 rounded-xl border border-gray-300 focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-all duration-300">
-                </div>
+              <p class="error-text hidden"></p>
+                        </div>
+              </div>
               </div>
 
               <!-- Item Name -->
-              <div class="transform transition-all duration-300 hover:scale-[1.02]">
-                <label class="block font-semibold mb-2 text-gray-700">Item Name <span class="text-red-500">*</span></label>
-                <textarea name="Item_Name" rows="2" required value=""
-                    class="input-focus w-full p-3 rounded-xl border border-gray-300 focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-all duration-300 resize-none">
-                    {{ $item->Item_Name }}</textarea>
-              </div>
+             <div class="transform transition-all duration-300 hover:scale-[1.02]">
+        <label class="block font-semibold mb-2 text-gray-700">Item Name <span class="text-red-500">*</span></label>
+        <div class="input-wrap">
+        <textarea name="Item_Name" rows="2" required 
+          class="input-focus w-full p-3 rounded-xl border border-gray-300 focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-all duration-300 resize-none text-left">{{ $item->Item_Name }}</textarea>
+       <p class="error-text hidden"></p>
+        </div>
+         </div>
             </div>
             <!-- Memo Right Column -->
             <div class="flex-1 transform transition-all duration-300 hover:scale-[1.01]">
               <label class="block font-semibold mb-2 text-gray-700">Memo</label>
+                    <div class="input-wrap">
+
               <textarea name="Memo" rows="10"
                       class="input-focus w-full p-4 rounded-xl border border-gray-300 focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-all duration-300 resize-y">{{ $item->Memo }}</textarea>
-            </div>
+             <p class="error-text hidden"></p>
+                    </div>
+               </div>
           </div>
         </div>
 
         <!-- Pricing Information -->
         <div class="fade-in">
-          <div class="pricing-card p-6 rounded-2xl border border-gray-200/80 transition-all duration-300">
-            <h3 class="text-xl font-bold mb-6 bg-gradient-to-r from-indigo-600 to-purple-600 bg-clip-text text-transparent">
-              Pricing Information
-            </h3>
+  <div class="pricing-card p-6 rounded-2xl border border-gray-200/80 bg-white shadow-sm">
+    <h3 class="text-xl font-bold mb-6 bg-gradient-to-r from-indigo-600 to-purple-600 bg-clip-text text-transparent">
+      Pricing Information
+    </h3>
 
-            <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
-              <div class="transform transition-all duration-300 hover:scale-[1.02]">
-                <label class="block font-semibold mb-2 text-gray-700">Basic Price <span class="text-red-500">*</span></label>
-                <div class="flex items-center">
-                  <input type="text" name="BasicPrice" required placeholder="0" value="{{ $item->BasicPrice }}"
-                         class="price-input input-focus flex-1 p-3 rounded-xl border border-gray-300 focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-all duration-300" />
-                  <span class="ml-3 text-gray-600 font-medium">円</span>
-                </div>
-              </div>
-
-              <div class="transform transition-all duration-300 hover:scale-[1.02]">
-                <label class="block font-semibold mb-2 text-gray-700">List Price <span class="text-red-500">*</span></label>
-                <div class="flex items-center">
-                  <input type="text" name="ListPrice" required placeholder="0" value="{{ $item->ListPrice }}"
-                         class="price-input input-focus flex-1 p-3 rounded-xl border border-gray-300 focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-all duration-300" />
-                  <span class="ml-3 text-gray-600 font-medium">円</span>
-                </div>
-              </div>
-
-              <div class="transform transition-all duration-300 hover:scale-[1.02]">
-                <label class="block font-semibold mb-2 text-gray-700">Cost Price <span class="text-red-500">*</span></label>
-                <div class="flex items-center">
-                  <input type="text" name="CostPrice" required placeholder="0" value="{{ $item->CostPrice }}"
-                         class="price-input input-focus flex-1 p-3 rounded-xl border border-gray-300 focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-all duration-300" />
-                  <span class="ml-3 text-gray-600 font-medium">円</span>
-                </div>
-              </div>
-            </div>
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+      
+      <!-- Basic Price -->
+      <div class="space-y-2">
+        <label class="block font-semibold text-gray-700 text-sm">
+          Sale Price <span class="text-red-500">*</span>
+        </label>
+        <div class="flex items-center input-wrap">
+          <div class="relative flex-1">
+            <input 
+              type="text" 
+              name="SalePrice" 
+              required 
+              placeholder="0"
+              value="{{ $item->SalePrice }}"
+              class="price-input input-focus w-full p-4 rounded-xl border border-gray-300 focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-all duration-300 text-sm text-right placeholder:text-right"
+            />
+            <p class="error-text hidden text-xs text-red-500 mt-1 text-right"></p>
           </div>
+          <span class="ml-3 text-gray-600 font-medium whitespace-nowrap">
+            円
+          </span>
         </div>
+      </div>
+
+      <!-- List Price -->
+      <div class="space-y-2">
+        <label class="block font-semibold text-gray-700 text-sm">
+          List Price <span class="text-red-500">*</span>
+        </label>
+        <div class="flex items-center input-wrap">
+          <div class="relative flex-1">
+            <input 
+              type="text" 
+              name="ListPrice" 
+              required 
+              placeholder="0"
+              value="{{ $item->ListPrice }}"
+              class="price-input input-focus w-full p-4 rounded-xl border border-gray-300 focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-all duration-300 text-sm text-right placeholder:text-right"
+            />
+            <p class="error-text hidden text-xs text-red-500 mt-1 text-right"></p>
+          </div>
+          <span class="ml-3 text-gray-600 font-medium whitespace-nowrap">
+            円
+          </span>
+        </div>
+      </div>
+      
+    </div>
+  </div>
+</div>
 
         <!-- SKU Section -->
         <div class="fade-in">
@@ -378,43 +431,54 @@
 
             <div class="bg-white p-6 rounded-2xl border border-gray-200/80 shadow-sm">
               <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-6">
-                @for($i = 0; $i < 5; $i++)
-                  <div class="group space-y-3 p-4 bg-gray-50/50 rounded-xl border-2 border-dashed border-gray-300 image-upload-box transition-all duration-300">
-                    <!-- Preview -->
-                    <div id="imagePreview{{ $i }}" 
-                         class="image-preview w-full aspect-square bg-gradient-to-br from-gray-100 to-gray-200 rounded-xl flex items-center justify-center overflow-hidden shadow-inner">
+               @for($i = 0; $i < 5; $i++)
+              <div class="group space-y-3 p-4 bg-gray-50/50 rounded-xl border-2 border-dashed border-gray-300 image-upload-box transition-all duration-300">
+                  <!-- Preview -->
+                  <div id="imagePreview{{ $i }}" 
+                      class="image-preview w-full aspect-square bg-gradient-to-br from-gray-100 to-gray-200 rounded-xl flex items-center justify-center overflow-hidden shadow-inner">
                       <div class="text-center">
-                        <svg class="w-8 h-8 text-gray-400 mx-auto mb-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"></path>
-                        </svg>
-                        <span class="text-gray-400 text-xs">No Image</span>
+                          <svg class="w-8 h-8 text-gray-400 mx-auto mb-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"></path>
+                          </svg>
+                          <span class="text-gray-400 text-xs">No Image</span>
                       </div>
-                    </div>
+                  </div>
 
-                    <!-- Name Input -->
-                    <input id="imageName{{ $i }}" name="image_names[]" type="text" placeholder="Image name" 
-                           class="w-full p-2 text-sm rounded-lg border border-gray-300 focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-all duration-300" disabled>
+                  <!-- Name Input - Add readonly and onfocus to prevent editing -->
+                  <input id="imageName{{ $i }}" 
+                        name="image_names[]" 
+                        type="text" 
+                        placeholder="Image name" 
+                        
+                        onfocus="this.blur();" 
+                        class="w-full p-2 text-sm rounded-lg border border-gray-300 bg-gray-50 focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-all duration-300 cursor-default">
 
-                    <!-- Buttons -->
-                    <div class="flex gap-2">
+                  <!-- Buttons -->
+                  <div class="flex gap-2">
                       <label class="flex-1">
-                        <button id="imageBtn{{ $i }}" type="button" 
-                                class="btn-primary w-full px-3 py-2 text-sm text-white rounded-lg transition-all duration-300">
-                          Upload
-                        </button>
-                        <input id="imageInput{{ $i }}" name="images[]" type="file" accept="image/*" class="hidden">
+                          <button id="imageBtn{{ $i }}" 
+                                  type="button" 
+                                  class="btn-primary w-full px-3 py-2 text-sm text-white rounded-lg transition-all duration-300">
+                              Upload
+                          </button>
+                          <input id="imageInput{{ $i }}" 
+                                name="images[{{ $i }}]" 
+                                type="file" 
+                                accept="image/*" 
+                                class="hidden">
                       </label>
 
-                      <button id="imageRemove{{ $i }}" type="button" 
+                      <button id="imageRemove{{ $i }}" 
+                              type="button" 
                               class="px-3 py-2 text-sm bg-white border border-gray-300 rounded-lg hover:bg-gray-50 transition-all duration-300 transform hover:scale-105" 
                               title="Remove">
-                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path>
-                        </svg>
+                          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path>
+                          </svg>
                       </button>
-                    </div>
                   </div>
-                @endfor
+              </div>
+              @endfor
               </div>
 
               <input type="hidden" name="images_meta" id="imagesMeta" value="">
@@ -534,18 +598,17 @@ $existingImages = $item->images->map(function($img) {
       const existingSkus = @json($item->skus);
       const existingImages = @json($existingImages);
 
-
-  // State
-  const state = {
-    productImages: [null, null, null, null, null],
-    skus: []
-  };
-
-  document.addEventListener('DOMContentLoaded', () => {
+ document.addEventListener('DOMContentLoaded', () => {
     
     setupSkuModal();
   });
+// State
+const state = {
+  productImages: [null, null, null, null, null],
+  skus: []
+};
 
+// Remove autoFillImageNames function since we don't want empty names
 
 function setupImageSlot(i) {
     const input = document.getElementById(`imageInput${i}`);
@@ -554,36 +617,71 @@ function setupImageSlot(i) {
     const btn = document.getElementById(`imageBtn${i}`);
     const removeBtn = document.getElementById(`imageRemove${i}`);
 
-    btn.addEventListener('click', () => input.click());
+    // Clear any existing event listeners to prevent duplicates
+    const newBtn = btn.cloneNode(true);
+    btn.parentNode.replaceChild(newBtn, btn);
+    const newRemoveBtn = removeBtn.cloneNode(true);
+    removeBtn.parentNode.replaceChild(newRemoveBtn, removeBtn);
+    const newInput = input.cloneNode(true);
+    input.parentNode.replaceChild(newInput, input);
+    
+    // Get references to the new elements
+    const actualBtn = document.getElementById(`imageBtn${i}`);
+    const actualRemoveBtn = document.getElementById(`imageRemove${i}`);
+    const actualInput = document.getElementById(`imageInput${i}`);
+    const actualNameInput = document.getElementById(`imageName${i}`);
 
-    removeBtn.addEventListener('click', () => {
-      input.value = "";               // reset file input
-      state.productImages[i] = null;  // clear state
-      preview.innerHTML = '<div class="text-center">No Image</div>';
-      nameInput.value = "";
-      nameInput.disabled = true;
-      btn.textContent = "Upload";
+    // Clear name input initially if no image
+    if (!state.productImages[i]) {
+        actualNameInput.value = '';
+        actualNameInput.disabled = true;
+    }
 
-        state.productImages[i] = null;
-        preview.innerHTML = '<div class="text-center">No Image</div>';
-        nameInput.value = '';
-        nameInput.disabled = true;
-        btn.textContent = 'Upload';
+    actualBtn.addEventListener('click', (e) => {
+        e.preventDefault();
+        e.stopPropagation();
+        actualInput.click();
+    });
+
+    actualRemoveBtn.addEventListener('click', (e) => {
+        e.preventDefault();
+        e.stopPropagation();
         
+        actualInput.value = "";  // Clear file input
+        preview.innerHTML = '<div class="text-center">No Image</div>';
+        actualNameInput.value = "";
+        actualNameInput.disabled = true;
+        actualBtn.textContent = "Upload";
+        
+        // Mark for deletion if it was an existing image
+        if (state.productImages[i] && state.productImages[i].path) {
+            // Keep the image but mark it for deletion
+            state.productImages[i] = {
+                ...state.productImages[i],
+                shouldDelete: true,
+                file: null
+            };
+        } else {
+            // Just clear it if it was new or empty
+            state.productImages[i] = null;
+        }
     });
 
-    nameInput.addEventListener('input', () => {
-        if (!state.productImages[i]) state.productImages[i] = { file: null, name: '' };
-        state.productImages[i].name = nameInput.value;
+    actualNameInput.addEventListener('input', () => {
+        if (state.productImages[i]) {
+            state.productImages[i].name = actualNameInput.value;
+        }
     });
 
-    input.addEventListener('change', (e) => {
+    actualInput.addEventListener('change', (e) => {
+        e.stopPropagation(); // Prevent event bubbling
+        
         const file = e.target.files[0];
         if (!file) return;
 
-        if (file.size > 2 * 1024 * 1024) { // max 2MB
+        if (file.size > 2 * 1024 * 1024) {
             alert('File size must be less than 2MB');
-            input.value = '';
+            actualInput.value = '';
             return;
         }
 
@@ -593,39 +691,48 @@ function setupImageSlot(i) {
         };
         reader.readAsDataURL(file);
 
-        nameInput.disabled = false;
-        if (!nameInput.value) nameInput.value = file.name;
+        actualNameInput.disabled = false;
+        
+        // Get the item code from the form
+        const itemCode = document.getElementById('Item_Code')?.value || '';
+        
+        // Get file extension
+        const originalFileName = file.name;
+        const fileExtension = originalFileName.substring(originalFileName.lastIndexOf('.')).toLowerCase();
+        
+        // Auto-generate name: ItemCode-001.jpg, ItemCode-002.jpg, etc.
+        // Slot 0 = 001, Slot 1 = 002, etc.
+        const slotNumber = (i + 1).toString().padStart(3, '0');
+        const autoGeneratedName = itemCode ? `${itemCode}-${slotNumber}${fileExtension}` : originalFileName;
+        
+        // Set the auto-generated name
+        actualNameInput.value = autoGeneratedName;
 
-        btn.textContent = 'Edit';
+        actualBtn.textContent = 'Edit';
+        
+        // Preserve existing path if replacing an existing image
+        const existingPath = state.productImages[i]?.path || null;
+        
         state.productImages[i] = {
             file: file,
-            name: nameInput.value || file.name,
-            url: null
+            name: autoGeneratedName,
+            url: URL.createObjectURL(file),
+            path: existingPath,
+            shouldDelete: false  // Reset deletion flag
         };
+        
+        // Debug log
+        console.log(`Image slot ${i}: Name set to ${autoGeneratedName}`);
     });
+    
+    // Remove the problematic focus event listener
+    // Just use readonly attribute in HTML instead
+    
+    // Make name input look like it's not editable
+    actualNameInput.style.cursor = 'default';
+    actualNameInput.style.backgroundColor = '#f9fafb';
 }
 
-document.addEventListener("DOMContentLoaded", function () {
-    const itemCodeInput = document.getElementById("Item_Code");
-    const itemId = "{{ $item->id ?? '' }}"; // empty for create
-
-    itemCodeInput.addEventListener("input", function () {
-        const itemCode = itemCodeInput.value.trim();
-
-        if (itemCode === "") return;
-
-        fetch(`/check-itemcode?item_code=${itemCode}&id=${itemId}`)
-            .then(response => response.json())
-            .then(data => {
-                if (data.exists) {
-                    showAlert("Item Code already exists!");
-                    itemCodeInput.classList.add("is-invalid");
-                } else {
-                    itemCodeInput.classList.remove("is-invalid");
-                }
-            });
-    });
-});
 function loadExistingImages() {
     if (!existingImages || existingImages.length === 0) return;
 
@@ -636,30 +743,176 @@ function loadExistingImages() {
         const nameInput = document.getElementById(`imageName${index}`);
         const btn = document.getElementById(`imageBtn${index}`);
 
-        preview.innerHTML = `
-            <img src="${img.url}" class="w-full h-full object-cover rounded-xl">
-        `;
+        preview.innerHTML = `<img src="${img.url}" class="w-full h-full object-cover rounded-xl">`;
 
         nameInput.disabled = false;
         nameInput.value = img.filename;
         btn.textContent = "Edit";
 
+        // Store with correct structure
         state.productImages[index] = {
-            file: null,
+            file: null,  // No new file initially
             name: img.filename,
-            url: img.url
+            url: img.url,
+            path: img.path,
+            shouldDelete: false
         };
     });
 }
 
+// Alternative: Programmatic Form Submission
+document.getElementById("itemForm").addEventListener("submit", async function(e) {
+    e.preventDefault(); // Prevent default form submission
+    
+    const form = this;
+    const formData = new FormData(form);
+    
+    // Clear existing image files from FormData
+    for (let i = 0; i < 5; i++) {
+        formData.delete(`images[${i}]`);
+    }
+    
+    const imageStates = [];
+    const imageNames = [];
 
-window.addEventListener("DOMContentLoaded", () => {
+    console.log('🔄 Processing images before submission:');
+    
+    // Add images and states
+    for (let i = 0; i < 5; i++) {
+        const img = state.productImages[i];
+        
+        console.log(`  Slot ${i}:`, img);
+        
+        if (!img) {
+            imageStates.push("delete");
+            imageNames.push(null);
+            console.log(`    → State: delete (no image)`);
+        }
+        else if (img.shouldDelete) {
+            imageStates.push("delete");
+            imageNames.push(null);
+            console.log(`    → State: delete (marked for deletion)`);
+        }
+        else if (img.file instanceof File) {
+            imageStates.push("new");
+            imageNames.push(img.name);
+            formData.append(`images[${i}]`, img.file);
+            console.log(`    → State: new, File: ${img.name}, Size: ${img.file.size} bytes`);
+        }
+        else if (img.path) {
+            imageStates.push("existing");
+            imageNames.push(img.name);
+            console.log(`    → State: existing, Path: ${img.path}`);
+        }
+        else {
+            imageStates.push("delete");
+            imageNames.push(null);
+            console.log(`    → State: delete (fallback)`);
+        }
+        
+        // Add hidden inputs to FormData
+        formData.append(`imageStates[${i}]`, imageStates[i]);
+        formData.append(`imageNames[${i}]`, imageNames[i] || '');
+    }
+    
+    // Log what we're sending
+    console.log('📤 Submitting with FormData:');
+    for (let [key, value] of formData.entries()) {
+        console.log(`${key}:`, value instanceof File ? `${value.name} (${value.size} bytes)` : value);
+    }
+    
+    try {
+        console.log('🚀 Sending request to:', form.action);
+        
+        // Show loading state
+        const submitBtn = form.querySelector('button[type="submit"]');
+        const originalBtnText = submitBtn.innerHTML;
+        submitBtn.innerHTML = 'Updating...';
+        submitBtn.disabled = true;
+        
+        const response = await fetch(form.action, {
+            method: 'POST',
+            body: formData,
+            headers: {
+                'X-Requested-With': 'XMLHttpRequest',
+                'Accept': 'application/json'
+            }
+        });
+        
+        console.log('📥 Response status:', response.status);
+        
+        // Restore button state
+        submitBtn.innerHTML = originalBtnText;
+        submitBtn.disabled = false;
+        
+        let result;
+        try {
+            result = await response.json();
+            console.log('📦 Response data:', result);
+        } catch (jsonError) {
+            console.error('❌ JSON parse error:', jsonError);
+            alert('Server returned an invalid response. Please try again.');
+            return;
+        }
+        
+        if (response.ok && result.success) {
+            // Success - redirect
+            window.location.href = result.redirect || '/items';
+        } else {
+            // Show error message
+            let errorMessage = 'Error updating item';
+            
+            if (result.errors) {
+                // Laravel validation errors
+                errorMessage = Object.values(result.errors).flat().join('\n');
+            } else if (result.message) {
+                // Custom error message
+                errorMessage = result.message;
+            } else if (result.error) {
+                // Alternative error field
+                errorMessage = result.error;
+            }
+            
+            alert(errorMessage);
+            console.error('❌ Update failed:', result);
+        }
+    } catch (error) {
+        console.error('❌ Network or other error:', error);
+        
+        // Restore button state
+        const submitBtn = form.querySelector('button[type="submit"]');
+        submitBtn.innerHTML = 'Update';
+        submitBtn.disabled = false;
+        
+        alert('Network error or server unavailable. Please check your connection and try again.');
+    }
+});
+
+// Update DOMContentLoaded to avoid duplicate listeners
+let setupComplete = false;
+
+function initializeImageSlots() {
+    if (setupComplete) return;
+    
     loadExistingImages();
-
+    
     for (let i = 0; i < 5; i++) {
         setupImageSlot(i);
     }
-});
+    
+    setupComplete = true;
+}
+
+// Use either DOMContentLoaded or document.ready
+if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', initializeImageSlots);
+} else {
+    initializeImageSlots();
+}
+
+// Also initialize when the page is fully loaded
+window.addEventListener('load', initializeImageSlots);
+
 
 
   function setupSkuModal() {
@@ -683,54 +936,85 @@ window.addEventListener("DOMContentLoaded", () => {
     addSkuRowBtn.addEventListener('click', () => addSkuRow());
 
   saveSkusBtn.addEventListener('click', () => {
-  const newSkus = [];
-  let duplicateFound = false;
+    const newSkus = [];
+    let duplicateFound = false;
+    
+    // --- FIX: Tracking individual codes using Sets ---
+    const usedSizeCodes = new Set();
+    const usedColorCodes = new Set();
+    // ------------------------------------------------
+    
+    skuModalBody.querySelectorAll('tr').forEach(row => {
+        const sizeName = row.querySelector('.size-name')?.value.trim() || '';
+        const colorName = row.querySelector('.color-name')?.value.trim() || '';
+        const sizeCode = row.querySelector('.size-code')?.value.trim() || '';
+        const colorCode = row.querySelector('.color-code')?.value.trim() || '';
+        const janCode = row.querySelector('.jan-code')?.value.trim() || '';
+        const qtyFlag = row.querySelector('.qty-flag')?.value || 'false';
+        const stockQuantity = row.querySelector('.stock-quantity')?.value || '0';
 
-  skuModalBody.querySelectorAll('tr').forEach(row => {
-    const sizeName = row.querySelector('.size-name')?.value.trim() || '';
-    const colorName = row.querySelector('.color-name')?.value.trim() || '';
-    const sizeCode = row.querySelector('.size-code')?.value.trim() || '';
-    const colorCode = row.querySelector('.color-code')?.value.trim() || '';
-    const janCode = row.querySelector('.jan-code')?.value.trim() || '';
-    const qtyFlag = row.querySelector('.qty-flag')?.value || 'false';
-    const stockQuantity = row.querySelector('.stock-quantity')?.value || '0';
+        // Skip empty rows
+        if (!sizeName && !colorName && !sizeCode && !colorCode && !janCode) return;
 
-    // Skip empty rows
-    if (!sizeName && !colorName && !sizeCode && !colorCode && !janCode) return;
+        // Build a unique key for the pair check (still necessary for sizeName/colorName pairs)
+        const keyName = `${sizeName}__${colorName}`;
+        const keyCode = `${sizeCode}__${colorCode}`;
 
-    // Build a unique key for validation
-const keyName = `${sizeName}__${colorName}`;
-    const keyCode = `${sizeCode}__${colorCode}`;
 
-    // Check for duplicates in current collection
-    if (newSkus.some(s => s.keyName === keyName || s.keyCode === keyCode)) {
-        duplicateFound = true;
-    } else {
-        newSkus.push({
-            keyName,
-            keyCode,
-            sizeName,
-            colorName,
-            sizeCode,
-            colorCode,
-            janCode,
-            qtyFlag,
-            stockQuantity: parseInt(stockQuantity) || 0
-        });
+        // --- NEW DUPLICATION LOGIC ---
+        
+        // 1. Check for duplicate Name Pairs (XL__Black)
+        if (newSkus.some(s => s.keyName === keyName)) {
+            duplicateFound = true;
+        } 
+        // 2. Check for duplicate Code Pairs (1__1)
+        else if (newSkus.some(s => s.keyCode === keyCode)) {
+            duplicateFound = true;
+        }
+        // 3. Check for single Size Code reuse (e.g., using '1' twice)
+        else if (sizeCode && usedSizeCodes.has(sizeCode)) {
+            duplicateFound = true;
+        }
+        // 4. Check for single Color Code reuse (e.g., using 'A' twice)
+        else if (colorCode && usedColorCodes.has(colorCode)) {
+            duplicateFound = true;
+        }
+        // -----------------------------
+        
+        if (duplicateFound) {
+            // Stop loop early if needed, or let it finish to check all rows
+            // break; // Can use this if you're certain it's allowed in the loop context
+            return;
+        } else {
+            // Record the individual codes as used
+            if (sizeCode) usedSizeCodes.add(sizeCode);
+            if (colorCode) usedColorCodes.add(colorCode);
+
+            newSkus.push({
+                keyName,
+                keyCode,
+                sizeName,
+                colorName,
+                sizeCode,
+                colorCode,
+                janCode,
+                qtyFlag,
+                stockQuantity: parseInt(stockQuantity) || 0
+            });
+        }
+    });
+
+    if (duplicateFound) {
+        alert("Duplicate SKUs found! Ensure Size+Color combinations are unique, and individual Size Codes and Color Codes are used only once.");
+        return;
     }
-});
 
-if (duplicateFound) {
-    alert("Duplicate SKUs found! Size+Color or Code+Code must be unique.");
-    return;
-}
+    // Save cleaned SKUs to state
+    state.skus = newSkus.map(({ _key, ...sku }) => sku);
+    document.getElementById('skus_json').value = JSON.stringify(state.skus);
 
-  // Save cleaned SKUs to state
-  state.skus = newSkus.map(({ _key, ...sku }) => sku);
-  document.getElementById('skus_json').value = JSON.stringify(state.skus);
-
-  renderSkuTable();
-  skuModal.classList.remove('active');
+    renderSkuTable();
+    skuModal.classList.remove('active');
 });
 
 
@@ -795,47 +1079,87 @@ document.querySelectorAll('.price-input').forEach(input => {
 
 });
 
- function addSkuRow(skuData = {}) {
-    const rowId = Date.now(); // unique row ID
+  function addSkuRow(skuData = {}) {
+    const skuModalBody = document.getElementById('skuModalBody');
+    const rowId = Date.now() + Math.random();
+    
     const row = document.createElement('tr');
-    const isQtyFlagTrue = skuData.qtyFlag === true || skuData.Quantity > 0;
-    row.className = 'sku-row border-b border-gray-200 hover:bg-gray-50/50 transition-all duration-200';
-    row.innerHTML = `
-        <td class="p-3 border-r">
-            <button type="button" class="delete-row-btn text-red-500 hover:text-red-700 transition-colors p-1 rounded hover:bg-red-50" data-row-id="${rowId}">
-                <!-- SVG delete icon -->
-            </button>
-        </td>
-        <td class="p-3 border-r">
-            <input type="text" class="size-name w-full p-2 border rounded-lg" value="${skuData.sizeName || ''}" placeholder="Enter size name" name="skus[size_name][]">
-        </td>
-        <td class="p-3 border-r">
-            <input type="text" class="color-name w-full p-2 border rounded-lg" value="${skuData.colorName || ''}" placeholder="Enter color name" name="skus[color_name][]">
-        </td>
-        <td class="p-3 border-r">
-            <input type="text" class="size-code w-full p-2 border rounded-lg" value="${skuData.sizeCode || ''}" placeholder="Size code"  name="skus[color_code][]">
-        </td>
-        <td class="p-3 border-r">
-            <input type="text" class="color-code w-full p-2 border rounded-lg" value="${skuData.colorCode || ''}" placeholder="Color code"  name="skus[jan][]">
-        </td>
-        <td class="p-3 border-r">
-            <input type="text" class="jan-code w-full p-2 border rounded-lg" value="${skuData.janCode || ''}" placeholder="JAN code" name="skus[stock][]">
-        </td>
-        <td class="p-3 border-r" **w-48**">
-        <select class="qty-flag **w-full** p-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-all duration-200">
-                <option value="true" ${isQtyFlagTrue  ? 'selected' : ''}>Yes</option>
-                <option value="false" ${!isQtyFlagTrue ? 'selected' : ''}>No</option>
-            </select>
-        </td>
-        <td class="p-3">
-            <input type="number" class="stock-quantity text-right w-full p-2 border rounded-lg" value="${skuData.Quantity || 0}" min="0">
-        </td>
-    `;
-    skuModalBody.appendChild(row);
+  row.className = 'sku-row border-b border-gray-200';
+row.innerHTML = `
+  <td class="p-3 border-r">
+    <button type="button" class="delete-row-btn text-red-500 p-1 rounded transition-none" data-row-id="${rowId}">
+      <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path>
+      </svg>
+    </button>
+  </td>
+  <td class="p-3 border-r">
+  <div class="input-wrap">
+    <input type="text" class="size-name w-full p-2 border border-gray-300 rounded-lg transition-none" 
+           value="${skuData.sizeName || ''}" placeholder="Enter size name">
+           <p class="error-text hidden"></p>
+            </div>
+  </td>
+  <td class="p-3 border-r">
+  <div class="input-wrap">
+    <input type="text" class="color-name w-full p-2 border border-gray-300 rounded-lg transition-none" 
+           value="${skuData.colorName || ''}" placeholder="Enter color name">
+           <p class="error-text hidden"></p>
+            </div>
+  </td>
+ <td class="p-3 border-r">
+  <div class="input-wrap">
+    <input type="text" class="size-code w-full p-2 border border-gray-300 rounded-lg transition-none"
+           value="${skuData.sizeCode || ''}" placeholder="Size code">
 
-    // delete button
-    row.querySelector('.delete-row-btn').addEventListener('click', () => row.remove());
-}
+    <p class="error-text hidden"></p>
+  </div>
+</td>
+
+<td class="p-3 border-r">
+  <div class="input-wrap">
+    <input type="text" class="color-code w-full p-2 border border-gray-300 rounded-lg transition-none"
+           value="${skuData.colorCode || ''}" placeholder="Color code">
+
+    <p class="error-text hidden"></p>
+  </div>
+</td>
+
+  <td class="p-3 border-r">
+  <div class="input-wrap">
+    <input type="text" class="jan-code w-full p-2 border border-gray-300 rounded-lg transition-none" 
+           value="${skuData.janCode || ''}" placeholder="JAN code">
+            <p class="error-text hidden"></p>
+            </div>
+  </td>
+  <td class="p-3 border-r **w-48**">
+  <div class="input-wrap">
+        <select class="qty-flag **w-full** p-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-all duration-200">
+      <option value="true" ${skuData.qtyFlag === 'true' ? 'selected' : ''}>Yes</option>
+      <option value="false" ${skuData.qtyFlag === 'false' || !skuData.qtyFlag ? 'selected' : ''}>No</option>
+    </select>
+    <p class="error-text hidden"></p>
+            </div>
+  </td>
+  <td class="p-3">
+  <div class="input-wrap">
+    <input type="number" class="stock-quantity text-right w-full p-2 border border-gray-300 rounded-lg transition-none" 
+           value="${skuData.stockQuantity || '0'}" placeholder="0" min="0">
+           <p class="error-text hidden"></p>
+            </div>
+  </td>
+`;
+
+    skuModalBody.appendChild(row);
+    row.querySelector('.delete-row-btn').addEventListener('click', (e) => {
+      e.preventDefault();
+      row.remove();
+    });
+    attachSkuRowValidation(row);
+    
+    // checkSkuValidation();
+
+  }
 document.querySelectorAll('.image-name').forEach(input => {
     input.addEventListener('blur', () => {
         let name = input.value.trim();
@@ -931,6 +1255,8 @@ function loadExistingSkusIntoModal() {
 //     // No duplicate → submit form normally
 //     this.submit();
 // });
+
+
 
 </script>
 </body>

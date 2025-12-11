@@ -61,7 +61,7 @@
                     <p class="text-gray-600 mt-2">Track and manage your import history</p>
                 </div>
                 @if(request()->has('success'))
-                <div class="p-4 mb-4 text-green-800 bg-green-100 border border-green-300 rounded-lg">
+                <div class="p-4 mb-4 text-green-800 bg-green-100 border border-green-300 rounded-lg" id="success">
                     ✅ Import completed successfully!
                 </div>
                 @endif
@@ -138,14 +138,24 @@
                     </thead>
                     <tbody class="divide-y divide-gray-200">
                         <!-- Row 1 -->
-                       
+           
                         
                        @foreach($logs as $log)
+                                   @php
+    // Determine which routes to use based on Import_Type
+    $detailsRoute = $log->Import_Type == 1 
+        ? route('item-details', $log->ImportLog_ID) 
+        : route('sku-details', $log->ImportLog_ID);
+
+    $errorsRoute = $log->Import_Type == 1
+        ? route('item-errors', $log->ImportLog_ID)
+        : route('sku-errors', $log->ImportLog_ID);
+@endphp
 <tr class="hover:bg-gray-50/50 transition-all duration-200">
     <!-- Detail button -->
     <td class="p-4">
-    <a href="{{ route('item-details', $log->ImportLog_ID) }}"
-    class="inline-flex items-center px-4 py-2 bg-gray-100 text-gray-700 rounded-lg hover:bg-indigo-50 hover:text-indigo-600">
+        <a href="{{ $detailsRoute }}"
+     class="inline-flex items-center px-4 py-2 bg-gray-100 text-gray-700 rounded-lg hover:bg-indigo-50 hover:text-indigo-600">
         <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                 d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path>
@@ -183,12 +193,12 @@
 
     <!-- Record Count -->
     <td class="p-4">
-        <span class="font-medium text-gray-800">{{ number_format($log->Record_Count) }} items</span>
+        <a href="{{ $detailsRoute }}">  <span class="font-medium text-gray-800">{{ number_format($log->Record_Count) }} items</span></a>
     </td>
 
     <!-- Error Count -->
     <td class="p-4">
-       <a href="{{ route('item-errors', $log->ImportLog_ID) }}"> <span class="font-medium text-red-600">{{ $log->Error_Count }} errors</span></a>
+       <a href="{{  $errorsRoute }}"> <span class="font-medium text-red-600">{{ $log->Error_Count }} errors</span></a>
     </td>
 
     <!-- Status -->
@@ -318,7 +328,7 @@
             });
         });
          setTimeout(() => {
-        const alertBox = document.getElementById('successAlert');
+        const alertBox = document.getElementById('success');
         if (alertBox) {
             alertBox.style.transition = "opacity 0.5s ease";
             alertBox.style.opacity = "0";

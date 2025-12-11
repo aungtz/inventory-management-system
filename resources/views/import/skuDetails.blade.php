@@ -103,175 +103,33 @@
                 <table class="w-full">
                     <thead class="bg-gray-100 sticky-header">
                         <tr>
-                            <th class="p-3 text-left font-medium text-gray-700">Item_Code</th>
-                            <th class="p-3 text-left font-medium text-gray-700">Size_Name</th>
-                            <th class="p-3 text-left font-medium text-gray-700">Color_Name</th>
-                            <th class="p-3 text-left font-medium text-gray-700">Size_Code</th>
-                            <th class="p-3 text-left font-medium text-gray-700">Color_Code</th>
-                            <th class="p-3 text-left font-medium text-gray-700">JanCode</th>
-                            <th class="p-3 text-left font-medium text-gray-700">Quantity</th>
+                             <th class="p-3 text-left">Item Code</th>
+                                <th class="p-3 text-left">Size</th>
+                                <th class="p-3 text-left">Color</th>
+                                <th class="p-3 text-left">Size Code</th>
+                                <th class="p-3 text-left">Color Code</th>
+                                <th class="p-3 text-left">JAN Code</th>
+                                <th class="p-3 text-left">Quantity</th>
                         </tr>
                     </thead>
                     <tbody class="divide-y divide-gray-200">
                         <!-- Row 1 -->
-                        <tr class="hover:bg-gray-50">
-                            <td class="p-3 font-mono">ITM-001</td>
-                            <td class="p-3"><span class="size-badge">XL</span></td>
-                            <td class="p-3">
-                                <div class="flex items-center">
-                                    <span class="color-badge" style="background-color: #dc2626;"></span>
-                                    Red
-                                </div>
-                            </td>
-                            <td class="p-3 font-mono">XL001</td>
-                            <td class="p-3 font-mono">RED01</td>
-                            <td class="p-3 font-mono">4901234567890</td>
-                            <td class="p-3 font-medium">50</td>
-                        </tr>
-                        
-                        <!-- Row 2 -->
-                        <tr class="hover:bg-gray-50">
-                            <td class="p-3 font-mono">ITM-001</td>
-                            <td class="p-3"><span class="size-badge">M</span></td>
-                            <td class="p-3">
-                                <div class="flex items-center">
-                                    <span class="color-badge" style="background-color: #2563eb;"></span>
-                                    Blue
-                                </div>
-                            </td>
-                            <td class="p-3 font-mono">M001</td>
-                            <td class="p-3 font-mono">BLU01</td>
-                            <td class="p-3 font-mono">4901234567891</td>
-                            <td class="p-3 font-medium">35</td>
-                        </tr>
-                        
-                        <!-- Row 3 -->
-                        <tr class="hover:bg-gray-50">
-                            <td class="p-3 font-mono">ITM-001</td>
-                            <td class="p-3"><span class="size-badge">L</span></td>
-                            <td class="p-3">
-                                <div class="flex items-center">
-                                    <span class="color-badge" style="background-color: #000000;"></span>
-                                    Black
-                                </div>
-                            </td>
-                            <td class="p-3 font-mono">L001</td>
-                            <td class="p-3 font-mono">BLK01</td>
-                            <td class="p-3 font-mono">4901234567892</td>
-                            <td class="p-3 font-medium">42</td>
-                        </tr>
-                        
-                        <!-- Row 4 -->
-                        <tr class="hover:bg-gray-50">
-                            <td class="p-3 font-mono">ITM-002</td>
-                            <td class="p-3"><span class="size-badge">L</span></td>
-                            <td class="p-3">
-                                <div class="flex items-center">
-                                    <span class="color-badge" style="background-color: #000000;"></span>
-                                    Black
-                                </div>
-                            </td>
-                            <td class="p-3 font-mono">L002</td>
-                            <td class="p-3 font-mono">BLK01</td>
-                            <td class="p-3 font-mono">4909876543210</td>
-                            <td class="p-3 font-medium">120</td>
-                        </tr>
-                        
-                        <!-- Row 5 -->
-                        <tr class="hover:bg-gray-50">
-                            <td class="p-3 font-mono">ITM-002</td>
-                            <td class="p-3"><span class="size-badge">M</span></td>
-                            <td class="p-3">
-                                <div class="flex items-center">
-                                    <span class="color-badge" style="background-color: #dc2626;"></span>
-                                    Red
-                                </div>
-                            </td>
-                            <td class="p-3 font-mono">M002</td>
-                            <td class="p-3 font-mono">RED02</td>
-                            <td class="p-3 font-mono">4909876543211</td>
-                            <td class="p-3 font-medium">85</td>
-                        </tr>
-                        
-                        <!-- Row 6 -->
-                        <tr class="hover:bg-gray-50">
-                            <td class="p-3 font-mono">ITM-003</td>
-                            <td class="p-3"><span class="size-badge">32</span></td>
-                            <td class="p-3">
-                                <div class="flex items-center">
-                                    <span class="color-badge" style="background-color: #1e40af;"></span>
-                                    Navy Blue
-                                </div>
-                            </td>
-                            <td class="p-3 font-mono">32</td>
-                            <td class="p-3 font-mono">NAV01</td>
-                            <td class="p-3 font-mono">4905551234567</td>
-                            <td class="p-3 font-medium">65</td>
-                        </tr>
-                        
-                        <!-- Row 7 -->
-                        <tr class="hover:bg-gray-50">
-                            <td class="p-3 font-mono">ITM-003</td>
-                            <td class="p-3"><span class="size-badge">34</span></td>
-                            <td class="p-3">
-                                <div class="flex items-center">
-                                    <span class="color-badge" style="background-color: #1e40af;"></span>
-                                    Navy Blue
-                                </div>
-                            </td>
-                            <td class="p-3 font-mono">34</td>
-                            <td class="p-3 font-mono">NAV01</td>
-                            <td class="p-3 font-mono">4905551234568</td>
-                            <td class="p-3 font-medium">58</td>
-                        </tr>
-                        
-                        <!-- Row 8 -->
-                        <tr class="hover:bg-gray-50">
-                            <td class="p-3 font-mono">ITM-004</td>
-                            <td class="p-3"><span class="size-badge">9</span></td>
-                            <td class="p-3">
-                                <div class="flex items-center">
-                                    <span class="color-badge" style="background-color: #ffffff; border: 1px solid #ccc;"></span>
-                                    White
-                                </div>
-                            </td>
-                            <td class="p-3 font-mono">9</td>
-                            <td class="p-3 font-mono">WHT01</td>
-                            <td class="p-3 font-mono">4907778889999</td>
-                            <td class="p-3 font-medium">90</td>
-                        </tr>
-                        
-                        <!-- Row 9 -->
-                        <tr class="hover:bg-gray-50">
-                            <td class="p-3 font-mono">ITM-004</td>
-                            <td class="p-3"><span class="size-badge">10</span></td>
-                            <td class="p-3">
-                                <div class="flex items-center">
-                                    <span class="color-badge" style="background-color: #000000;"></span>
-                                    Black
-                                </div>
-                            </td>
-                            <td class="p-3 font-mono">10</td>
-                            <td class="p-3 font-mono">BLK02</td>
-                            <td class="p-3 font-mono">4907778889990</td>
-                            <td class="p-3 font-medium">75</td>
-                        </tr>
-                        
-                        <!-- Row 10 -->
-                        <tr class="hover:bg-gray-50">
-                            <td class="p-3 font-mono">ITM-005</td>
-                            <td class="p-3"><span class="size-badge">OS</span></td>
-                            <td class="p-3">
-                                <div class="flex items-center">
-                                    <span class="color-badge" style="background-color: #78350f;"></span>
-                                    Brown
-                                </div>
-                            </td>
-                            <td class="p-3 font-mono">OS</td>
-                            <td class="p-3 font-mono">BRN01</td>
-                            <td class="p-3 font-mono">4904443332221</td>
-                            <td class="p-3 font-medium">120</td>
-                        </tr>
+                        @foreach ($items as $item)
+            <tr class="hover:bg-gray-50">
+                <td class="p-3 font-mono">{{ $item->Item_Code }}</td>
+                <td class="p-3"><span class="size-badge">{{ $item->SizeName }}</span></td>
+                <td class="p-3">
+                    <div class="flex items-center">
+                        <span class="color-badge" style="background-color: #{{ $item->ColorCode ?? 'ccc' }}"></span>
+                        {{ $item->ColorName }}
+                    </div>
+                </td>
+                <td class="p-3 font-mono">{{ $item->SizeCode }}</td>
+                <td class="p-3 font-mono">{{ $item->ColorCode }}</td>
+                <td class="p-3 font-mono">{{ $item->JanCD }}</td>
+                <td class="p-3 font-medium">{{ $item->Quantity }}</td>
+            </tr>
+        @endforeach
                     </tbody>
                 </table>
             </div>

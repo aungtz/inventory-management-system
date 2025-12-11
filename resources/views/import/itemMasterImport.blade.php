@@ -465,10 +465,8 @@
 
             // Cancel button
             cancelBtn.addEventListener('click', function() {
-                if (selectedFile && !confirm('Are you sure you want to cancel? Any unsaved changes will be lost.')) {
-                    return;
-                }
-                window.location.href = 'import-log.html';
+                
+                window.location.href = '/item-master/import';
             });
 
             // Back button
@@ -476,7 +474,7 @@
                 if (selectedFile) {
                     e.preventDefault();
                     if (confirm('You have a file selected. Are you sure you want to leave?')) {
-                        window.location.href = 'import-log.html';
+                        window.location.href = '/item-master/import';
                     }
                 }
             });

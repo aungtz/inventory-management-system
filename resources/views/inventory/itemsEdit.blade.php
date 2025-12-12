@@ -1132,15 +1132,15 @@ row.innerHTML = `
             <p class="error-text hidden"></p>
             </div>
   </td>
-  <td class="p-3 border-r **w-48**">
+   <td class="p-3 border-r w-40">
   <div class="input-wrap">
-        <select class="qty-flag **w-full** p-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-all duration-200">
+    <select class="qty-flag !w-full p-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-all duration-200">
       <option value="true" ${skuData.qtyFlag === 'true' ? 'selected' : ''}>Yes</option>
       <option value="false" ${skuData.qtyFlag === 'false' || !skuData.qtyFlag ? 'selected' : ''}>No</option>
     </select>
     <p class="error-text hidden"></p>
-            </div>
-  </td>
+  </div>
+</td>
   <td class="p-3">
   <div class="input-wrap">
     <input type="number" class="stock-quantity text-right w-full p-2 border border-gray-300 rounded-lg transition-none" 

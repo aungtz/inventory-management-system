@@ -693,6 +693,8 @@ function getStringByteLength(str) {
     return byteLength;
 }
 
+
+
 /**
  * Validates the input against max byte length and required status.
  * @param {HTMLInputElement} input - The input element.

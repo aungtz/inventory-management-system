@@ -830,62 +830,66 @@ function setupImageSlot(i, options = {}) {
         const keyCode = `${sizeCode}__${colorCode}`;
 
         // --- DUPLICATE CHECKS ---
-        let sizeNameDup = newSkus.some(s => s.sizeName === sizeName);
-        let colorNameDup = newSkus.some(s => s.colorName === colorName);
-        let sizeCodeDup = newSkus.some(s => s.sizeCode === sizeCode);
-        let colorCodeDup = newSkus.some(s => s.colorCode === colorCode);
-        let pairNameDup = newSkus.some(s => s.keyName === keyName);
-        let pairCodeDup = newSkus.some(s => s.keyCode === keyCode);
+       // ---- DUPLICATE CHECKS ----
+let sizeNameDup  = newSkus.some(s => s.sizeName === sizeName);
+let colorNameDup = newSkus.some(s => s.colorName === colorName);
+let sizeCodeDup  = newSkus.some(s => s.sizeCode === sizeCode);
+let colorCodeDup = newSkus.some(s => s.colorCode === colorCode);
+let pairNameDup  = newSkus.some(s => s.keyName === keyName);
+let pairCodeDup  = newSkus.some(s => s.keyCode === keyCode);
 
-        if (sizeNameDup) {
-            duplicateFound = true;
-            alert(`Size Name "${sizeName}" is duplicate.`);
-            return;
-        }
+// Collect messages for multiple errors
+let errors = [];
 
-        if (colorNameDup) {
-            duplicateFound = true;
-            alert(`Color Name "${colorName}" is duplicate.`);
-            return;
-        }
+// 🔥 CASE 1: exact pair duplicate (sizeName + colorName)
+if (pairNameDup) {
+    errors.push(`Size "${sizeName}" AND Color "${colorName}" combination already exists.`);
+}
 
-        if (sizeCodeDup) {
-            duplicateFound = true;
-            alert(`Size Code "${sizeCode}" is duplicate.`);
-            return;
-        }
+// 🔥 CASE 2: exact pair duplicate (sizeCode + colorCode)
+if (pairCodeDup) {
+    errors.push(`SizeCode "${sizeCode}" AND ColorCode "${colorCode}" combination already exists.`);
+}
 
-        if (colorCodeDup) {
-            duplicateFound = true;
-            alert(`Color Code "${colorCode}" is duplicate.`);
-            return;
-        }
+// 🔥 CASE 3: individual field duplicates
+if (sizeNameDup && !pairNameDup) {
+    errors.push(`Size Name "${sizeName}" is already used.`);
+}
 
-        if (pairNameDup) {
-            duplicateFound = true;
-            alert(`Combination already exists: ${sizeName} + ${colorName}`);
-            return;
-        }
+if (colorNameDup && !pairNameDup) {
+    errors.push(`Color Name "${colorName}" is already used.`);
+}
 
-        if (pairCodeDup) {
-            duplicateFound = true;
-            alert(`Combination already exists: ${sizeCode} + ${colorCode}`);
-            return;
-        }
+if (sizeCodeDup && !pairCodeDup) {
+    errors.push(`Size Code "${sizeCode}" is already used.`);
+}
 
-        // If passed duplicate checks, add it to list
-        newSkus.push({
-            keyName,
-            keyCode,
-            sizeName,
-            colorName,
-            sizeCode,
-            colorCode,
-            janCode,
-            qtyFlag,
-            stockQuantity: parseInt(stockQuantity) || 0
-        });
-    });
+if (colorCodeDup && !pairCodeDup) {
+    errors.push(`Color Code "${colorCode}" is already used.`);
+}
+
+// 🔥 If any errors → stop saving
+if (errors.length > 0) {
+    duplicateFound = true;
+    alert(errors.join("\n")); // show all messages at once
+    return;
+}
+
+// No duplicates — safe to push
+newSkus.push({
+    keyName,
+    keyCode,
+    sizeName,
+    colorName,
+    sizeCode,
+    colorCode,
+    janCode,
+    qtyFlag,
+    stockQuantity: parseInt(stockQuantity) || 0
+});
+});
+
+
 
     // Error Handling
     if (janError) {
@@ -1006,15 +1010,15 @@ row.innerHTML = `
             <p class="error-text hidden"></p>
             </div>
   </td>
-  <td class="p-3 border-r **w-48**">
+  <td class="p-3 border-r w-48">
   <div class="input-wrap">
-        <select class="qty-flag **w-full** p-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-all duration-200">
+    <select class="qty-flag !w-full p-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-all duration-200">
       <option value="true" ${skuData.qtyFlag === 'true' ? 'selected' : ''}>Yes</option>
       <option value="false" ${skuData.qtyFlag === 'false' || !skuData.qtyFlag ? 'selected' : ''}>No</option>
     </select>
     <p class="error-text hidden"></p>
-            </div>
-  </td>
+  </div>
+</td>
   <td class="p-3">
   <div class="input-wrap">
     <input type="number" class="stock-quantity text-right w-full p-2 border border-gray-300 rounded-lg transition-none" 

@@ -470,7 +470,7 @@
         <!-- Stats Footer (Kept as is) -->
         @if($items->count() > 0)
         <div class="mt-8 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 fade-in">
-            <div class="bg-gradient-to-br from-blue-500 to-blue-600 text-white rounded-2xl p-6 shadow-lg transform hover:scale-105 transition-all duration-300">
+            <!-- <div class="bg-gradient-to-br from-blue-500 to-blue-600 text-white rounded-2xl p-6 shadow-lg transform hover:scale-105 transition-all duration-300">
                 <div class="flex items-center justify-between">
                     <div>
                         <p class="text-blue-100 text-sm font-semibold">Total Items</p>
@@ -502,7 +502,7 @@
                         <i class="fas fa-images text-2xl"></i>
                     </div>
                 </div>
-            </div>
+            </div> -->
     <div class="col-span-1 md:col-span-2 lg:col-span-4 flex justify-end">
                     
                                <div id="pagination" class="flex justify-end items-center gap-2 mt-4"></div>
